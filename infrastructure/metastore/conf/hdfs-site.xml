@@ -1,0 +1,30 @@
+<configuration>
+	<property>
+		<name>fs.defaultFS</name>
+		<value>s3a://sherlock-korcsmaros-group/</value>
+	</property>
+	<property>
+		<name>fs.s3a.connection.maximum</name>
+		<value>1500</value>
+	</property>
+	<property>
+		<name>fs.s3a.block.size</name>
+		<value>134217728</value>
+	</property>
+	<property>
+		<name>dfs.datanode.hdfs-blocks-metadata.enabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>fs.s3a.access.key</name>
+		<value>DNVEDQPT726QGMAZURPJ</value>
+	</property>
+	<property>
+		<name>fs.s3a.secret.key</name>
+		<value>ki1dDCABLunhZXcAaHFzONOnsJP9aIWLJSf4DewMMV4</value>
+	</property>
+	<property>
+		<name>fs.s3a.endpoint</name>
+		<value>ams3.digitaloceanspaces.com</value>
+	</property>
+</configuration>
