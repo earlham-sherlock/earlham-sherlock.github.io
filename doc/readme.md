@@ -33,7 +33,7 @@ This query will select 10 interaction from the `intact` table, then converts the
 `uniprot_id_mapping` table. If you need more than 10 interactions, then of course you can add your own 
 filtering criteria and delete `LIMIT 10`.
 
-Please note, the ID mapping is not necessarily unambiguous. If there is no uniprot mapping, or there is 
+Please note, the ID mapping is not necessarily unambiguous. If there is no uniprot mapping, or there are 
 more than one uniprot mapping for the given protein, then it can skip or return with multiple uniprot
 interactions for a single original interaction defined in the Intact database.
 
@@ -117,10 +117,92 @@ LIMIT 10;
 
 ### Enrich protein list with internal interactions
 
-TODO
+Starting from a set of nodes, we can get an initial network by selecting all the interactions between 
+these nodes. In the following example we will create this network by selecting links from the IntAct 
+database. We will save the results to a new table.
+
+Please note, by the nature of this query, the resulting network can contain multiple connected 
+components. Also if there was an initial node fits to no links in the IntAct database, we will
+loose the node from the resulting network (as we represent the network with a link list).
 
 
-### Enrich interaction list with first neighbours
+```$sql
+CREATE TABLE project.mate_my_new_ppi_table WITH (
+   format = 'ORC',
+) AS
 
-TODO
+SELECT intact.interactor_a_id, 
+       intact.interactor_b_id, 
+FROM master.intact_2018_10_04 intact
+WHERE intact.interactor_a_id IN ('ensg11867234247', 'ensg11867234247', 'ensg23829324243') 
+  AND intact.interactor_b_id IN ('ensg11867234247', 'ensg11867234247', 'ensg23829324243');
+```
+
+### Enrich protein list with internal interactions AND first neighbours
+
+If you simply change the `AND` to and `OR` in the query of the previous example, you will get 
+not only the interconnections, but also the first neighbours. 
+
+
+```$sql
+CREATE TABLE project.mate_my_new_ppi_table WITH (
+   format = 'ORC',
+) AS
+
+SELECT intact.interactor_a_id, 
+       intact.interactor_b_id, 
+FROM master.intact_2018_10_04 intact
+WHERE intact.interactor_a_id IN ('ensg11867234247', 'ensg11867234247', 'ensg23829324243') 
+   OR intact.interactor_b_id IN ('ensg11867234247', 'ensg11867234247', 'ensg23829324243');
+```
+
+
+### Enrich brain genes with interactions and first neighbours, based on IntAct
+
+Assuming we already have a set of proteins in some table (in our tissue table), then we can 
+also use an 'inner select' instead of listing all the proteins. In this example we are use
+the 100 most highly expressed brain genes as the base of the query.
+
+
+```$sql
+CREATE TABLE project.mate_my_new_ppi_table WITH (
+   format = 'ORC',
+) AS
+
+SELECT intact.interactor_a_id, 
+       intact.interactor_b_id, 
+FROM master.intact_2018_10_04 intact
+WHERE intact.interactor_a_id IN ( SELECT molecule_id FROM master.hpa_18 ORDER BY score DESC LIMIT 100 ) 
+  AND intact.interactor_b_id IN ( SELECT molecule_id FROM master.hpa_18 ORDER BY score DESC LIMIT 100 );
+```
+
+
+### Fetching a sequence region around an SNP
+
+In this example, we have a single point mutation on chromosome 11, in position 58723, and we 
+wish to fetch the wild type sequence around this SNP, let's say in +/- 700 length.
+
+The following query also expects that we store the sequence in at least 700 long chunks in the 
+data lake (what we do actually). The inner query part will fetch 3 chunks from the genome,
+and the outer part will split our region of interest from this "large sequence". The query 
+also handles the case, when there is no 700 long sequence around the SNP (e.g. if the mutation
+is positioned int he very begining or very end of the chromosome).
+
+
+```$sql
+SELECT 
+   SUBSTR(long_sequence, 
+          MAX(1, SNP_POS-700-long_sequence_start), 
+          MIN(LENGTH(long_sequence) - (MAX(1, SNP_POS-700-long_sequence_start)), SNP_POS+700-long_sequence_start) ) 
+   AS result
+FROM (
+        SELECT 
+            ARRAY_JOIN ( ARRAY_AGG(genome.sequence ORDER BY genome.start) ) AS long_sequence
+            MIN(genome.start) AS long_sequence_start
+        FROM master.hg38 genome
+        WHERE genome.chr = ‘chr11’
+          AND genome.start BETWEEN SNP_POS - 2000 AND SNP_POS + 1000;
+      );
+```
+
 
