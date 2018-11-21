@@ -1,27 +1,3 @@
-# Sherlock
-
-Sherlock is a data platform used by EI researchers, collaborators and services developed in the 
-KorcsmarosLab.
-
-Features:
-* **store** all datasets in a redundant, organized  storage
-* **convert** all datasets to common, query compatible file format
-* **execute** analytical queries on top of data files
-* **share** datasets among different teams / projects
-* **generate** operational datasets for certain services or collaborators
-
-
-## Tables defined in the master zone in Presto
-
-
-| Table Name                 | Description                                     |
-| -------------------------- | ----------------------------------------------- | 
-| intact_2018_10_04          | Intact molecule interaction database            | 
-| string_10_05               | String molecule interaction database            | 
-| uniprot_id_mapping_2018_09 | Id mapping data from Uniprot                    | 
-| hpa_18                     | Tissue identifiers from the Human Protein Atlas |
-
-
 ## Example queries
 In the following we will show different example queries, relying on the data already loaded into the 
 data lake.
@@ -56,9 +32,9 @@ LIMIT 10;
 
 ### Select proteins from a given human tissue
 
-This query only use the Human Protein Atlas, filtering it based on tax id and a given tissue ID.
-In the example we use the BTO ID 142, which is the brain. Please note, the query will retrun only
-the proteins which are exactly specified with BTO ID 142, and will not return the proteins assigned
+This query only use the Bgee gene expression database, filtering it based on tax id and a given tissue ID.
+In the example we use the UBERON ID 955, which is the brain. Please note, the query will retrun only
+the proteins which are exactly specified with UBERON ID 955, and will not return the proteins assigned
 to a more specific brain tissue.
 
 Here we also use the `LIMIT 10` statement to return only the first 10 results (making the example to
@@ -67,20 +43,20 @@ run quicker).
 ```$sql
 SELECT molecule_id, 
        molecule_id_type, 
-       tissue_bto_id, 
-       tissue_bto_name, 
+       tissue_uberon_id, 
+       tissue_uberon_name, 
        score
-FROM master.hpa_18
-WHERE tax_id = 9606 AND tissue_bto_id = 142
+FROM master.bgee_14_0
+WHERE tax_id = 9606 AND tissue_uberon_id = 955
 LIMIT 10;
 ```
 
 
 ### Filtering human Intact interactions based on tissue
 
-This query use the Human Protein Atlas, to filter molecular interactions based on the tissue ID.
-In the example we use the BTO ID 142, which is the brain. Please note, the query will retrun only
-the protein interactions where both proteins are exactly specified with BTO ID 142, and will not 
+Here we use the Bgee gene expression database, to filter molecular interactions based on the tissue ID.
+In the example we use the UBERON ID 955, which is the brain. Please note, the query will retrun only
+the protein interactions where both proteins are exactly specified with UBERON ID 955, and will not 
 return any interactions where any protein is assigned to any other tissue, not even the more specific
 brain tissues.
 
@@ -94,23 +70,23 @@ run quicker).
 ```$sql
 SELECT intact.interactor_a_id, 
        intact.interactor_b_id, 
-       hpa_a.tissue_bto_id AS tissue_bto_id, 
-       hpa_a.tissue_bto_name AS tissue_bto_name, 
-       hpa_a.score AS score_a,
-       hpa_b.score AS score_b
+       bgee_a.tissue_uberon_id AS tissue_uberon_id, 
+       bgee_a.tissue_uberon_name AS tissue_uberon_name, 
+       bgee_a.score AS score_a,
+       bgee_b.score AS score_b
 FROM master.intact_2018_10_04 intact
-LEFT JOIN master.hpa_18 hpa_a ON 
-             intact.interactor_a_tax_id = hpa_a.tax_id AND
-             intact.interactor_a_id = hpa_a.molecule_id AND
-             intact.interactor_a_id_type = hpa_a.molecule_id_type
-LEFT JOIN master.hpa_18 hpa_b ON 
-             intact.interactor_b_tax_id = hpa_b.tax_id AND
-             intact.interactor_b_id = hpa_b.molecule_id AND
-             intact.interactor_b_id_type = hpa_b.molecule_id_type
+LEFT JOIN master.bgee_14_0 bgee_a ON 
+             intact.interactor_a_tax_id = bgee_a.tax_id AND
+             intact.interactor_a_id = bgee_a.molecule_id AND
+             intact.interactor_a_id_type = bgee_a.molecule_id_type
+LEFT JOIN master.bgee_14_0 bgee_b ON 
+             intact.interactor_b_tax_id = bgee_b.tax_id AND
+             intact.interactor_b_id = bgee_b.molecule_id AND
+             intact.interactor_b_id_type = bgee_b.molecule_id_type
 WHERE intact.interactor_a_tax_id = 9606 
   AND intact.interactor_b_tax_id = 9606
-  AND hpa_a.tissue_bto_id = 142
-  AND hpa_b.tissue_bto_id = 142
+  AND bgee_a.tissue_uberon_id = 955
+  AND bgee_b.tissue_uberon_id = 955
 LIMIT 10;
 ```
 
@@ -172,8 +148,8 @@ CREATE TABLE project.mate_my_new_ppi_table WITH (
 SELECT intact.interactor_a_id, 
        intact.interactor_b_id, 
 FROM master.intact_2018_10_04 intact
-WHERE intact.interactor_a_id IN ( SELECT molecule_id FROM master.hpa_18 ORDER BY score DESC LIMIT 100 ) 
-  AND intact.interactor_b_id IN ( SELECT molecule_id FROM master.hpa_18 ORDER BY score DESC LIMIT 100 );
+WHERE intact.interactor_a_id IN ( SELECT molecule_id FROM master.bgee_18 ORDER BY score DESC LIMIT 100 ) 
+  AND intact.interactor_b_id IN ( SELECT molecule_id FROM master.bgee_18 ORDER BY score DESC LIMIT 100 );
 ```
 
 

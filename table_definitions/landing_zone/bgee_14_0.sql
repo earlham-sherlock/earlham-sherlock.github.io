@@ -1,4 +1,4 @@
-CREATE TABLE landing.hpa_18 (
+CREATE TABLE IF NOT EXISTS landing.bgee_14_0 (
    molecule_id VARCHAR(64) NOT NULL,
    molecule_id_type VARCHAR(25) NOT NULL,
    tax_id INT NOT NULL,
@@ -9,4 +9,4 @@ CREATE TABLE landing.hpa_18 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['tax_id'],
-   external_location = 'S3://sherlock-korcsmaros-group/landing_zone/hpa_18' );
+   external_location = 'S3://sherlock-korcsmaros-group/landing_zone/bgee_14_0' );

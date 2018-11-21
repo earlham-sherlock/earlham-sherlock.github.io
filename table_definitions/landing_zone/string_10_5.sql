@@ -1,4 +1,4 @@
-CREATE TABLE landing.string_10_5 (
+CREATE TABLE IF NOT EXISTS landing.string_10_5 (
    interactor_a_id VARCHAR(64) NOT NULL,
    interactor_b_id VARCHAR(64) NOT NULL,
    interactor_a_id_type VARCHAR(25) NOT NULL,

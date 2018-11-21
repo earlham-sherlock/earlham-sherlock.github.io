@@ -1,4 +1,4 @@
-CREATE TABLE landing.uniprot_id_mapping_2018_09 (
+CREATE TABLE IF NOT EXISTS landing.uniprot_id_mapping_2018_09 (
    tax_id  INT NOT NULL,
    from_id_type  VARCHAR(25) NOT NULL,
    to_id_type  VARCHAR(25) NOT NULL,
