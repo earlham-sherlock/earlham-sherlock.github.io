@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS landing.intact_2018_10_04 (
+CREATE TABLE IF NOT EXISTS landing.omnipath_0_7_111 (
    interactor_a_id VARCHAR,
    interactor_b_id VARCHAR,
    interactor_a_id_type VARCHAR,
@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS landing.intact_2018_10_04 (
    interaction_detection_methods_mi_id ARRAY<INT>,
    interaction_types_mi_id ARRAY<INT>,
    source_databases_mi_id ARRAY<INT> ,
-   pmids ARRAY< BIGINT  >,
+   pmids ARRAY<BIGINT>,
    interactor_a_tax_id INT
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['interactor_a_tax_id'],
-   external_location = 's3a://sherlock-korcsmaros-group/landing_zone/intact_2018_11_02' );
+   external_location = 's3a://sherlock-korcsmaros-group/landing_zone/omnipath_0.7.111' );
 
 -- don't forget to refresh the partition list!
