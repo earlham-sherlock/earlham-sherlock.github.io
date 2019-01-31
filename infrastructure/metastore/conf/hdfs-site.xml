@@ -1,7 +1,7 @@
 <configuration>
 	<property>
 		<name>fs.defaultFS</name>
-		<value>s3a://sherlock-korcsmaros-group/</value>
+		<value>${HIVE_DEFAULT_FS}</value>
 	</property>
 	<property>
 		<name>fs.s3a.connection.maximum</name>
@@ -17,14 +17,14 @@
 	</property>
 	<property>
 		<name>fs.s3a.access.key</name>
-		<value>DNVEDQPT726QGMAZURPJ</value>
+		<value>${S3_ACCESS_KEY}</value>
 	</property>
 	<property>
 		<name>fs.s3a.secret.key</name>
-		<value>ki1dDCABLunhZXcAaHFzONOnsJP9aIWLJSf4DewMMV4</value>
+		<value>${S3_SECRET_KEY}</value>
 	</property>
 	<property>
 		<name>fs.s3a.endpoint</name>
-		<value>ams3.digitaloceanspaces.com</value>
+		<value>${S3_END_POINT}</value>
 	</property>
 </configuration>

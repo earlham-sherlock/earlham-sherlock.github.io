@@ -1,0 +1,31 @@
+version: '3.6'
+
+services:
+  metastore:
+    image: sherlock/metastore
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - 9083:9083
+
+  postgres:
+    image: postgres:9.6.10
+    volumes:
+      - metastorepostgresqldata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: hive
+    healthcheck:
+        test: ["CMD", "pg_isready", "-U", "hive"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+
+volumes:
+  metastorepostgresqldata:

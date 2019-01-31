@@ -12,8 +12,6 @@ RUN mkdir /opt/presto && \
 ADD etc /opt/presto/etc
 ADD entrypoint.sh /entrypoint.sh
 
-EXPOSE 8080
-
 #ENTRYPOINT ["/opt/presto/bin/launcher", "run"]
 ENTRYPOINT ["bash", "/entrypoint.sh"]
 #CMD ["/opt/presto/bin/launcher", "run"]

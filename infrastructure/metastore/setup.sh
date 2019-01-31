@@ -15,5 +15,5 @@ export HADOOP_USER_CLASSPATH_FIRST=true
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
 
 cd /opt
-wget http://xenia.sote.hu/ftp/mirrors/www.apache.org/hive/hive-3.1.0/apache-hive-3.1.0-bin.tar.gz
-tar xzf apache-hive-3.1.0-bin.tar.gz
+wget http://xenia.sote.hu/ftp/mirrors/www.apache.org/hive/hive-3.1.0/apache-hive-3.1.1-bin.tar.gz
+tar xzf apache-hive-3.1.1-bin.tar.gz

@@ -12,7 +12,7 @@
 	</property>
 	<property>
 		<name>javax.jdo.option.ConnectionURL</name>
-		<value>jdbc:postgresql://postgres:5432/hive?createDatabaseIfNotExist=true</value>
+		<value>${DB_JDBC}</value>
 	</property>
 	<property>
 		<name>javax.jdo.option.ConnectionDriverName</name>
@@ -20,11 +20,11 @@
 	</property>
 	<property>
 		<name>javax.jdo.option.ConnectionUserName</name>
-		<value>hive</value>
+		<value>${DB_USER}</value>
 	</property>
 	<property>
 		<name>javax.jdo.option.ConnectionPassword</name>
-		<value>hive</value>
+		<value>${DB_PASSWD}</value>
 	</property>
 	<property>
 		<name>datanucleus.fixedDatastore</name>
