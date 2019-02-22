@@ -8,16 +8,13 @@ Most of the JSON attributes are taken from the DB file, but some of them are pro
 
 ## Parameters:
 
---input-db <path to SQLite db file> [mandatory]
---output-json <path to an output json file> [mandatory]
-
---interactor-a-molecula-type-mi-id <integer> [mandatory]
---interactor-a-molecula-type-mi-term-name <string term name> [mandatory]
-
---interactor-b-molecula-type-mi-id <integer> [mandatory]
---interactor-b-molecula-type-mi-term-name <string term name> [mandatory]
-
---source-database-mi-id <integer> [optional]
+- `--input-db <path to SQLite db file>` [mandatory]
+- `--output-json <path to an output json file>` [mandatory]
+- `--interactor-a-molecula-type-mi-id <integer>` [mandatory]
+- `--interactor-a-molecula-type-mi-term-name <string term name>` [mandatory]
+- `--interactor-b-molecula-type-mi-id <integer>` [mandatory]
+- `--interactor-b-molecula-type-mi-term-name <string term name>` [mandatory]
+- `--source-database-mi-id <integer>` [optional]
 
 
 ## Input file format
