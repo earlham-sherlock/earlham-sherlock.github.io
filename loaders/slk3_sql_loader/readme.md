@@ -5,8 +5,6 @@
 
 This script takes a SignaLinK 3 compatible SQLite DB file, and converts it to Sherlock compatible JSON format.
 Most of the JSON attributes are taken from the DB file, but some of them are provided as input parameters.
-The script automatically create an output .json file in the output folder. The name of the output .json file will be
-the same as the input SLK3 database file.
 
 
 **Parameters:**
@@ -23,14 +21,13 @@ the same as the input SLK3 database file.
 
 -db, --source-database-mi-id <int>                          : single MI ID of the database [optional]
 
--o, --output-folder <path>                                  : path to an output folder [mandatory]
+-o, --output-file <path>                                    : path to an output file [mandatory]
 
 
 **Exit codes**
 
 Exit code 1: The specified input SLK3 database file doesn't exists!
 Exit code 2: The specified input SLK3 database file is not a .db file!
-Exit code 3: The specified output folder doesn't exists!
 
 
 **Input file format**

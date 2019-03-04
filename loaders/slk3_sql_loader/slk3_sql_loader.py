@@ -16,8 +16,6 @@ def parse_args(args):
 
         This script takes a SignaLinK 3 compatible SQLite DB file, and converts it to Sherlock compatible JSON format.
         Most of the JSON attributes are taken from the DB file, but some of them are provided as input parameters.
-        The script automatically create an output .json file in the output folder. The name of the output .json file will be
-        the same as the input SLK3 database file.
         
         
         **Parameters:**
@@ -34,14 +32,13 @@ def parse_args(args):
         
         -db, --source-database-mi-id <int>                          : single MI ID of the database [optional]
         
-        -o, --output-folder <path>                                  : path to an output folder [mandatory]
+        -o, --output-file <path>                                    : path to an output file [mandatory]
         
         
         **Exit codes**
         
         Exit code 1: The specified input SLK3 database file doesn't exists!
         Exit code 2: The specified input SLK3 database file is not a .db file!
-        Exit code 3: The specified output folder doesn't exists!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -95,21 +92,21 @@ def parse_args(args):
                         required=False,
                         default=[""])
 
-    # Output folder path
-    parser.add_argument("-o", "--output-folder",
+    # Output file path
+    parser.add_argument("-o", "--output-file",
                         help="<path to an output folder> [mandatory]",
                         type=str,
-                        dest="output_folder",
+                        dest="output_file",
                         action="store",
                         required=True)
 
     results = parser.parse_args(args)
     return results.input_db_file, results.interactor_a_molecule_type_mi_id,\
            results.interactor_a_molecule_type_mi_term_name.lower(), results.interactor_b_molecule_type_mi_id, \
-           results.interactor_b_molecule_type_mi_term_name.lower(), results.source_db_mi_id, results.output_folder
+           results.interactor_b_molecule_type_mi_term_name.lower(), results.source_db_mi_id, results.output_file
 
 
-def check_params(input_db_file, output_folder):
+def check_params(input_db_file):
 
     if not os.path.isfile(input_db_file):
         sys.stderr.write(f"ERROR! the specified input SLK3 database file doesn't exists: "
@@ -120,10 +117,6 @@ def check_params(input_db_file, output_folder):
         sys.stderr.write(f"ERROR! the specified input SLK3 database file is not a .db file: "
                          f"{input_db_file}")
         sys.exit(2)
-
-    if not os.path.isdir(output_folder):
-        sys.stderr.write(f"ERROR! the specified output folder doesn't exists: {output_folder}")
-        sys.exit(3)
 
 
 def create_connection(db_file):
@@ -198,17 +191,15 @@ def main():
 
     input_db_file, interactor_a_molecule_type_mi_id, interactor_a_molecule_type_mi_term_name, \
     interactor_b_molecule_type_mi_id, interactor_b_molecule_type_mi_term_name, source_db_mi_id, \
-    output_folder = parse_args(sys.argv[1:])
+    output_file = parse_args(sys.argv[1:])
 
-    check_params(input_db_file, output_folder)
+    check_params(input_db_file)
     print(f'====== Parameters are fine, starting... ======')
 
     connection = create_connection(input_db_file)
     with connection:
-        new_file = f'{input_db_file.split("/")[-1].split(".")[0].strip()}.json'
-        output_json_file = os.path.join(output_folder, new_file)
-        with open(output_json_file, 'w') as output:
-            print(f'====== Write results to output file: {output_json_file} ======')
+        with open(output_file, 'w') as output:
+            print(f'====== Write results to output file: {output_file} ======')
             select_from_db_file(connection, interactor_a_molecule_type_mi_id, interactor_a_molecule_type_mi_term_name,
                                 interactor_b_molecule_type_mi_id, interactor_b_molecule_type_mi_term_name, source_db_mi_id,
                                 output)
