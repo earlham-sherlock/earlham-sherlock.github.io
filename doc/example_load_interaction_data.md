@@ -1,14 +1,14 @@
 # Loading Interaction data to sherlock
 
 
-###STEP 1: store raw files
+## STEP 1: store raw files
 copy raw database files to S3 for each database, like:
 - `s3://sherlock-korcsmaros-group/raw_zone/intact_2018_10_04`
 - `s3://sherlock-korcsmaros-group/raw_zone/string_10_5`
 
 ---
 
-###STEP 2: convert to json
+## STEP 2: convert to json
 
 Generate and copy json files to landing zone, partitioned by interactor_a_tax_id, like:
 `s3://sherlock-korcsmaros-group/landing_zone/intact_2018_10_04/interactor_a_tax_id=9606/intact.json`
@@ -57,7 +57,7 @@ Use the following syntax when crating the values for each attribute:
 
 ---
 
-###STEP 3: register landing tables in Presto:
+## STEP 3: register landing tables in Presto:
 
 For each molecular interaction database we need to register a table in the landing zone:
 
@@ -85,7 +85,7 @@ CREATE TABLE landing.intact_2018_10_04 (
 
 ---
 
-###STEP 4: convert to ORC in the master zone (+ finer partitioning & total ordering):
+## STEP 4: convert to ORC in the master zone (+ finer partitioning & total ordering):
 
 ```
 CREATE TABLE master.intact_2018_10_04 WITH (
