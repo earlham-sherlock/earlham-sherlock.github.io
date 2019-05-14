@@ -49,6 +49,7 @@ def parse_args(args):
         **Notes**
 
         1) The HINT database does not include the mi identifiers of the interaction types!
+        2) HINT database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10000!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
