@@ -198,12 +198,15 @@ def write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor
         detection_method = i.split(":")[1]
         pm_id = i.split(":")[0]
 
-        if detection_method not in json_dictionary["interaction_detection_methods_mi_id"]:
+        if int(detection_method) not in json_dictionary["interaction_detection_methods_mi_id"]:
             json_dictionary["interaction_detection_methods_mi_id"].append(int(detection_method))
 
         string = re.findall("([A-Za-z])", pm_id)
 
         if string:
+            continue
+
+        elif ";" in pm_id:
             continue
 
         else:
