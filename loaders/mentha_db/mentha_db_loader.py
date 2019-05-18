@@ -226,15 +226,19 @@ def main():
 
     output_file = os.path.join(new_folder, f'mentha_db.json')
 
+    species = f'taxid:{interactor_a_tax_id}'
+
     with open(input_file, 'r') as f, open(output_file, 'w') as out:
 
         print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Writing interactions to output file: {output_file} ---')
         for line in f:
             line = line.strip().split('\t')
-            write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor_a_molecule_type_mi_id,
-                            interactor_a_molecule_type_mi_term_name, interactor_b_molecule_type_mi_id,
-                            interactor_b_molecule_type_mi_term_name, interaction_detection_method,
-                            interaction_type_mi_id, source_db_mi_id, pubmed_id, out)
+
+            if species in line[9] and species in line[10]:
+                write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor_a_molecule_type_mi_id,
+                                interactor_a_molecule_type_mi_term_name, interactor_b_molecule_type_mi_id,
+                                interactor_b_molecule_type_mi_term_name, interaction_detection_method,
+                                interaction_type_mi_id, source_db_mi_id, pubmed_id, out)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Mentha Database Loader script finished successfully! ---')
 
