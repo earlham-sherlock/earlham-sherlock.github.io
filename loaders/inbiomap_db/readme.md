@@ -43,11 +43,13 @@ Exit code 1: The specified input file doesn't exists!
 
 **Notes**
 
-1) The HINT database does not include the mi identifiers of the interaction types!
-2) HINT database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10002!
+1) The InBioMap database does not include the mi identifiers of the interaction types!
+2) InBioMap database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10002!
 3) The interaction type is not in the database file, so we defined it according to the published paper of the database!
 It was 0915, physical association!
 4) The pubmed ID of the published paper for the HINT database is 27892958!
+5) We have to identify just the tax ID of interactor A, because the script make the output folder with this parameter!
+The tax id of interactor B is identified from the database file!
 
 
 **Example**
