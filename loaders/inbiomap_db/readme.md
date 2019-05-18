@@ -5,8 +5,8 @@
 This script takes an InBioMap database file, which contains protein-protein
 interactions and converts it to Sherlock compatible JSON format.
 
-The downloaded database file does not contain the parameters below!
-Because of this, the user have to identify these mandatory parameters!
+The downloaded database file does not contain some of the parameters below!
+Because of this, the user have to identify these parameters!
 
 
 **Parameters:**
@@ -17,6 +17,8 @@ Because of this, the user have to identify these mandatory parameters!
 
 -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B [mandatory]
 
+-int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
+
 -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A [mandatory]
 
 -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A [mandatory]
@@ -24,6 +26,14 @@ Because of this, the user have to identify these mandatory parameters!
 -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B [mandatory]
 
 -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B [mandatory]
+
+-int_det_m, --interaction-detection-method <int>              : comma separated list of the detection methods of the interaction [optional]
+
+-int_type_id, --interaction-type-mi-id <int>                  : comma separated list of MI IDs of the interaction type [optional]
+
+-db, --source-db-mi-id <int>                                  : comma separated list of MI IDs of the database sources [optional]
+
+-pmid, --pubmed-id <int>                                      : comma separated list of pubmed IDs of the paper [optional]
 
 
 **Exit codes**
@@ -33,7 +43,11 @@ Exit code 1: The specified input file doesn't exists!
 
 **Notes**
 
-1) InBioMap database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10002!
+1) The HINT database does not include the mi identifiers of the interaction types!
+2) HINT database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10002!
+3) The interaction type is not in the database file, so we defined it according to the published paper of the database!
+It was 0915, physical association!
+4) The pubmed ID of the published paper for the HINT database is 27892958!
 
 
 **Example**
@@ -46,12 +60,12 @@ uniprotkb:A0AV02	uniprotkb:P24941	uniprotkb:S12A8_HUMAN|ensembl:ENSG00000221955|
 ```
 
 Terminal command:
-python3 inbiomap_db_loader.py -i example_files/test.tsv -int_a_id uniprotac -int_b_id uniprotac -int_a_m_id 0326 -int_b_m_id 0326 -int_a_m_tn protein -int_b_m_tn protein
+`python3 inbiomap_db_loader.py -i example_files/test.tsv -int_a_id uniprotac -int_b_id uniprotac -int_a_tax_id 9606 -int_a_m_id 0326 -int_b_m_id 0326 -int_a_m_tn protein -int_b_m_tn protein -int_type_id 0915 -pmid 27892958`
 
 The output will be:
 - output file: interactor_a_tax_id=9606/inbiomap_db.json
 ```
-{"interactor_a_id": "a0a5b9", "interactor_b_id": "p01892", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [45], "interaction_types_mi_id": [], "source_database_mi_id": [10002], "pmids": []}
-{"interactor_a_id": "a0auz9", "interactor_b_id": "q96cv9", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [45], "interaction_types_mi_id": [], "source_database_mi_id": [10002], "pmids": []}
-{"interactor_a_id": "a0av02", "interactor_b_id": "p24941", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [362], "interaction_types_mi_id": [], "source_database_mi_id": [10002], "pmids": []}
+{"interactor_a_id": "a0a5b9", "interactor_b_id": "p01892", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [45], "interaction_types_mi_id": [915], "source_database_mi_id": [461, 10002], "pmids": [27892958]}
+{"interactor_a_id": "a0auz9", "interactor_b_id": "q96cv9", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [45], "interaction_types_mi_id": [915], "source_database_mi_id": [461, 10002], "pmids": [27892958]}
+{"interactor_a_id": "a0av02", "interactor_b_id": "p24941", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [362], "interaction_types_mi_id": [915], "source_database_mi_id": [461, 10002], "pmids": [27892958]}
 ```
