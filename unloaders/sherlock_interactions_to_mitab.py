@@ -1,7 +1,8 @@
 import argparse
 import tempfile
 import sys
-from common_libs.mitab_handler import mitab_handler # common_libs is in the navigomix repo: navigomix/analytic_modules/common_libs
+sys.path.append("..")
+import mitab_handler
 
 class ArgumentParser:
 

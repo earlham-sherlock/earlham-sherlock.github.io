@@ -1,0 +1,39 @@
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>${HIVE_DEFAULT_FS}</value>
+    </property>
+    <property>
+        <name>fs.s3a.connection.maximum</name>
+        <value>1500</value>
+    </property>
+    <property>
+        <name>fs.s3a.block.size</name>
+        <value>134217728</value>
+    </property>
+    <property>
+        <name>dfs.datanode.hdfs-blocks-metadata.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>${S3_ACCESS_KEY}</value>
+    </property>
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>${S3_SECRET_KEY}</value>
+    </property>
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>${S3_END_POINT}</value>
+    </property>
+
+    <property>
+        <name>fs.s3a.path.style.access</name>
+        <value>${S3_PATH_STYLE_ACCESS}</value>
+    </property>
+    <property>
+        <name>fs.s3a.impl</name>
+        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+    </property>
+</configuration>
