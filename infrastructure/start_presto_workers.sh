@@ -5,7 +5,7 @@ set -e
 source ./prepare_config_variables.sh
 ./init_docker.sh
 
-SERVICE_NAME="sherlock-presto-worker"
+SERVICE_NAME="sherlock-presto-workers"
 
 echo -e "\n======="
 echo -e "======= starting service: ${SERVICE_NAME}"
