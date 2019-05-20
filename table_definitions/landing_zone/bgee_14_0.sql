@@ -9,6 +9,6 @@ CREATE TABLE IF NOT EXISTS landing.bgee_14_0 (
 ) WITH (
    format            = ''JSON'',
    partitioned_by    = ARRAY[''tax_id''],
-   external_location = ''s3a://sherlock-korcsmaros-group/landing_zone/bgee_14_0'' );
+   external_location = ''s3a://sherlock/landing_zone/bgee_14_0'' );
 
 -- don't forget to refresh the partition list!

@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS landing.uniprot_id_mapping_2018_11 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['tax_id'],
-   external_location = 's3a://sherlock-korcsmaros-group/landing_zone/uniprot_id_mapping_2018_11' );
+   external_location = 's3a://sherlock/landing_zone/uniprot_id_mapping_2018_11' );
 
 -- don't forget to refresh the partition list!
