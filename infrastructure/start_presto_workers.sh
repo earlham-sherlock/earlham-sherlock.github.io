@@ -34,7 +34,7 @@ docker service create  \
   --with-registry-auth  \
   --name ${SERVICE_NAME}  \
   --container-label ${SERVICE_NAME}  \
-  --replicas 1 \
+  --replicas ${SHERLOCK_NUMBER_OF_WORKERS} \
   --reserve-memory ${SHERLOCK_PRESTO_MEMORY_RESERVATION} \
   --limit-memory ${SHERLOCK_PRESTO_MEMORY_LIMIT} \
   --reserve-cpu ${SHERLOCK_PRESTO_CPU_CORES} \
