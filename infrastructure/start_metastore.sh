@@ -38,6 +38,7 @@ docker service create  \
   --reserve-memory 1gb \
   --limit-memory 1gb \
   --network sherlock-overlay \
+  --network host \
   --publish published=${SHERLOCK_METASTORE_PORT},target=9083 \
   --env HIVE_DEFAULT_FS="s3a://${SHERLOCK_BUCKET_NAME}/" \
   --env S3_ACCESS_KEY="${SHERLOCK_S3_ACCESS_KEY}" \

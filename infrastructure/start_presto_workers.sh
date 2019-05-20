@@ -40,6 +40,7 @@ docker service create  \
   --reserve-cpu ${SHERLOCK_PRESTO_CPU_CORES} \
   --limit-cpu ${SHERLOCK_PRESTO_CPU_CORES} \
   --network sherlock-overlay \
+  --network host \
   --env IS_COORDINATOR="false" \
   --env DISCOVERY_CONFIG="" \
   --env DISCOVERY_URI="http://sherlock-presto-coordinator:8080" \

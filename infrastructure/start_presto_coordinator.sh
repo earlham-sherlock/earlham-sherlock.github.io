@@ -40,6 +40,7 @@ docker service create  \
   --reserve-cpu ${SHERLOCK_PRESTO_CPU_CORES} \
   --limit-cpu ${SHERLOCK_PRESTO_CPU_CORES} \
   --network sherlock-overlay \
+  --network host \
   --publish published=${SHERLOCK_PRESTO_PORT},target=8080 \
   --env IS_COORDINATOR="true" \
   --env DISCOVERY_CONFIG="discovery-server.enabled=true" \
