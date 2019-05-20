@@ -5,3 +5,4 @@ TODO: backupservice:
 
 ## prerequisites
 
+- install `bc` (we calculate memory settings with it): `sudo apt-get install bc`

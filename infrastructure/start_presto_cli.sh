@@ -19,7 +19,7 @@ then
     exit 1
 fi
 
-IMAGE=`docker ps | grep sherlock-presto-coordinator |  awk '{print $2}'`
+IMAGE=`docker service ps sherlock-presto-coordinator | grep sherlock-presto-coordinator |  awk '{print $3}'`
 
 docker run \
    --rm \

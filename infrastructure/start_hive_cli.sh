@@ -19,7 +19,7 @@ then
     exit 1
 fi
 
-IMAGE=`docker ps | grep sherlock-metastore |  awk '{print $2}'`
+IMAGE=`docker service ps sherlock-metastore | grep sherlock-metastore |  awk '{print $3}'`
 
 docker run \
    --rm \
