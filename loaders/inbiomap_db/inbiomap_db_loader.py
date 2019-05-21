@@ -23,19 +23,19 @@ def parse_args(args):
         
         -i, --input-file <path>                                       : path to an existing HINT db file [mandatory]
         
-        -int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A [mandatory]
+        -int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A, default: uniprotac [optional]
         
-        -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B [mandatory]
+        -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B, default: uniprotac [optional]
         
         -int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
         
-        -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A [mandatory]
+        -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A, default: 326 [optional]
         
-        -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A [mandatory]
+        -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A, default: protein [optional]
         
-        -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B [mandatory]
+        -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B, default: 326 [optional]
         
-        -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B [mandatory]
+        -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B, default: protein [optional]
         
         -int_det_m, --interaction-detection-method <int>              : comma separated list of the detection methods of the interaction [optional]
         
@@ -48,17 +48,7 @@ def parse_args(args):
         
         **Exit codes**
         
-        Exit code 1: The specified input file doesn't exists!
-        
-        
-        **Notes**
-        
-        1) The InBioMap database does not include the mi identifiers of the interaction types!
-        2) InBioMap database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10002!
-        3) The interaction type is not in the database file, so we defined it according to the published paper of the database!
-        It was 0915, physical association!
-        4) The pubmed ID of the published paper for the HINT database is 27892958!
-        5) We have to identify just the tax ID of interactor A, because the script make the output folder with this parameter! The tax id of interactor B is identified from the database file!
+        Exit code 1: The specified input file does not exists!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -75,14 +65,16 @@ def parse_args(args):
                         type=str,
                         dest="interactor_a_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_b_id", "--interactor-b-id-type",
                         help="<ID type of interactor B> [mandatory]",
                         type=str,
                         dest="interactor_b_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_a_tax_id", "--interactor-a-tax-id",
                         help="<taxonomy ID of interactor A> [mandatory]",
@@ -96,28 +88,32 @@ def parse_args(args):
                         type=int,
                         dest="interactor_a_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_a_m_tn", "--interactor-a-molecule-type-mi-term-name",
                         help="<MI term name entity type of interactor A> [mandatory]",
                         type=str,
                         dest="interactor_a_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_b_m_id", "--interactor-b-molecule-type-mi-id",
                         help="<MI ID entity type of interactor B> [mandatory]",
                         type=int,
                         dest="interactor_b_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_b_m_tn", "--interactor-b-molecule-type-mi-term-name",
                         help="<MI term name entity type of interactor B> [mandatory]",
                         type=str,
                         dest="interactor_b_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_det_m", "--interaction-detection-method",
                         help="<comma separated list of the detection methods of the interaction> [optional]",
@@ -159,7 +155,7 @@ def parse_args(args):
 def check_params(input_file):
 
     if not os.path.isfile(input_file):
-        sys.stderr.write(f"ERROR! the specified input file doesn't exists: {input_file}")
+        sys.stderr.write(f"ERROR MESSAGE: The specified input file does not exists: {input_file}")
         sys.exit(1)
 
 
@@ -182,8 +178,6 @@ def write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor
     json_dictionary["interaction_types_mi_id"] = []
     json_dictionary["source_database_mi_id"] = [int(line[12].split(":")[2].split('"')[0])]
     json_dictionary["pmids"] = []
-
-    json_dictionary["source_database_mi_id"].append(10002)
 
     if interaction_detection_method:
         methods = interaction_detection_method.split(",")
@@ -223,7 +217,7 @@ def main():
     interaction_detection_method, interaction_type_mi_id, source_db_mi_id, pubmed_id = parse_args(sys.argv[1:])
 
     check_params(input_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Parameters are fine, starting... ---')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
     output_folder = input_file.split("/")[:-1]
     output_folder = "".join(output_folder)
@@ -235,7 +229,7 @@ def main():
 
     with open(input_file, 'r') as f, open(output_file, 'w') as out:
 
-        print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Writing interactions to output file: {output_file} ---')
+        print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing interactions to output file: {output_file}')
         for line in f:
             line = line.strip().split('\t')
             write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor_a_molecule_type_mi_id,
@@ -243,7 +237,7 @@ def main():
                             interactor_b_molecule_type_mi_term_name, interaction_detection_method,
                             interaction_type_mi_id, source_db_mi_id, pubmed_id, out)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- InBioMap Database Loader script finished successfully! ---')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: InBioMap Database Loader script finished successfully!')
 
 
 if __name__ == '__main__':
