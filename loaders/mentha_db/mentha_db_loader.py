@@ -12,39 +12,46 @@ def parse_args(args):
         === Mentha Database Loader script ===
         
         **Description:**
-
+        
         This script takes a Mentha database file, which contains protein-protein
         interactions and converts it to Sherlock compatible JSON format.
         
-        The downloaded database file does not contain the parameters below!
-        Because of this, the user have to identify these mandatory parameters!
+        The downloaded database file does not contain some of the parameters below!
+        Because of this, the user have to identify these parameters!
         
         
         **Parameters:**
         
         -i, --input-file <path>                                       : path to an existing HINT db file [mandatory]
         
-        -int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A [mandatory]
+        -int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A, default: uniprotac [optional]
         
-        -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B [mandatory]
+        -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B, default: uniprotac [optional]
         
-        -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A [mandatory]
+        -int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
         
-        -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A [mandatory]
+        -int_b_tax_id, --interactor-b-tax-id <int>                    : taxonomy ID of interactor B [mandatory]
         
-        -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B [mandatory]
+        -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A, default: 326 [optional]
         
-        -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B [mandatory]
+        -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A, default: protein [optional]
+        
+        -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B, default: 326 [optional]
+        
+        -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B, default: protein [optional]
+        
+        -int_det_m, --interaction-detection-method <int>              : comma separated list of the detection methods of the interaction [optional]
+        
+        -int_type_id, --interaction-type-mi-id <int>                  : comma separated list of MI IDs of the interaction type [optional]
+        
+        -db, --source-db-mi-id <int>                                  : comma separated list of MI IDs of the database sources [optional]
+        
+        -pmid, --pubmed-id <int>                                      : comma separated list of pubmed IDs of the paper [optional]
         
         
         **Exit codes**
         
-        Exit code 1: The specified input file doesn't exists!
-        
-        
-        **Notes**
-        
-        1) Mentha database does not have any Uniprot Ref identifier, that is why, we give an unique id for it, 10001!
+        Exit code 1: The specified input file does not exists!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -57,18 +64,20 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-int_a_id", "--interactor-a-id-type",
-                        help="<ID type of interactor A> [mandatory]",
+                        help="<ID type of interactor A> [optional]",
                         type=str,
                         dest="interactor_a_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_b_id", "--interactor-b-id-type",
-                        help="<ID type of interactor B> [mandatory]",
+                        help="<ID type of interactor B> [optional]",
                         type=str,
                         dest="interactor_b_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_a_tax_id", "--interactor-a-tax-id",
                         help="<taxonomy ID of interactor A> [mandatory]",
@@ -78,32 +87,36 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-int_a_m_id", "--interactor-a-molecule-type-mi-id",
-                        help="<MI ID entity type of interactor A> [mandatory]",
+                        help="<MI ID entity type of interactor A> [optional]",
                         type=int,
                         dest="interactor_a_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_a_m_tn", "--interactor-a-molecule-type-mi-term-name",
-                        help="<MI term name entity type of interactor A> [mandatory]",
+                        help="<MI term name entity type of interactor A> [optional]",
                         type=str,
                         dest="interactor_a_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_b_m_id", "--interactor-b-molecule-type-mi-id",
-                        help="<MI ID entity type of interactor B> [mandatory]",
+                        help="<MI ID entity type of interactor B> [optional]",
                         type=int,
                         dest="interactor_b_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_b_m_tn", "--interactor-b-molecule-type-mi-term-name",
-                        help="<MI term name entity type of interactor B> [mandatory]",
+                        help="<MI term name entity type of interactor B> [optional]",
                         type=str,
                         dest="interactor_b_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_det_m", "--interaction-detection-method",
                         help="<comma separated list of the detection methods of the interaction> [optional]",
@@ -145,7 +158,7 @@ def parse_args(args):
 def check_params(input_file):
 
     if not os.path.isfile(input_file):
-        sys.stderr.write(f"ERROR! the specified input file doesn't exists: {input_file}")
+        sys.stderr.write(f"ERROR MESSAGE: The specified input file does not exists: {input_file}")
         sys.exit(1)
 
 
@@ -166,7 +179,7 @@ def write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor
     json_dictionary["interactor_b_molecule_type_name"] = interactor_b_molecule_type_mi_term_name
     json_dictionary["interaction_detection_methods_mi_id"] = [int(line[6].split(":")[2].split('"')[0])]
     json_dictionary["interaction_types_mi_id"] = [int(line[11].split(":")[2].split('"')[0])]
-    json_dictionary["source_database_mi_id"] = [10001]
+    json_dictionary["source_database_mi_id"] = [int(line[12].split(":")[2].split('"')[0])]
     json_dictionary["pmids"] = []
 
     pm_id = line[8].split(":")[1]
@@ -216,7 +229,7 @@ def main():
     interaction_detection_method, interaction_type_mi_id, source_db_mi_id, pubmed_id = parse_args(sys.argv[1:])
 
     check_params(input_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Parameters are fine, starting... ---')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
     output_folder = input_file.split("/")[:-1]
     output_folder = "".join(output_folder)
@@ -230,17 +243,17 @@ def main():
 
     with open(input_file, 'r') as f, open(output_file, 'w') as out:
 
-        print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Writing interactions to output file: {output_file} ---')
+        print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing interactions to output file: {output_file}')
         for line in f:
             line = line.strip().split('\t')
 
-            if species in line[9] and species in line[10]:
+            if species in line[9]:
                 write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor_a_molecule_type_mi_id,
                                 interactor_a_molecule_type_mi_term_name, interactor_b_molecule_type_mi_id,
                                 interactor_b_molecule_type_mi_term_name, interaction_detection_method,
                                 interaction_type_mi_id, source_db_mi_id, pubmed_id, out)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: --- Mentha Database Loader script finished successfully! ---')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Mentha Database Loader script finished successfully!')
 
 
 if __name__ == '__main__':
