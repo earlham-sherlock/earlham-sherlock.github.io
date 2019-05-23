@@ -19,8 +19,6 @@ Because of this, the user have to identify these parameters!
 
 -int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
 
--int_b_tax_id, --interactor-b-tax-id <int>                    : taxonomy ID of interactor B [mandatory]
-
 -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A, default: 326 [optional]
 
 -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A, default: protein [optional]

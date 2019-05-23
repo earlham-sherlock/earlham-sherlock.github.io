@@ -9,6 +9,46 @@ def parse_args(args):
     help_text = \
         """
         === iRefIndex Database Loader script ===
+        
+        **Description:**
+        
+        This script takes an InBioMap database file, which contains protein-protein
+        interactions and converts it to Sherlock compatible JSON format.
+        
+        The downloaded database file does not contain some of the parameters below!
+        Because of this, the user have to identify these parameters!
+        
+        
+        **Parameters:**
+        
+        -i, --input-file <path>                                       : path to an existing HINT db file [mandatory]
+        
+        -int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A, default: uniprotac [optional]
+        
+        -int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B, default: uniprotac [optional]
+        
+        -int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
+        
+        -int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A, default: 326 [optional]
+        
+        -int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A, default: protein [optional]
+        
+        -int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B, default: 326 [optional]
+        
+        -int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B, default: protein [optional]
+        
+        -int_det_m, --interaction-detection-method <int>              : comma separated list of the detection methods of the interaction [optional]
+        
+        -int_type_id, --interaction-type-mi-id <int>                  : comma separated list of MI IDs of the interaction type [optional]
+        
+        -db, --source-db-mi-id <int>                                  : comma separated list of MI IDs of the database sources [optional]
+        
+        -pmid, --pubmed-id <int>                                      : comma separated list of pubmed IDs of the paper [optional]
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -21,18 +61,20 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-int_a_id", "--interactor-a-id-type",
-                        help="<ID type of interactor A> [mandatory]",
+                        help="<ID type of interactor A> [optional]",
                         type=str,
                         dest="interactor_a_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_b_id", "--interactor-b-id-type",
-                        help="<ID type of interactor B> [mandatory]",
+                        help="<ID type of interactor B> [optional]",
                         type=str,
                         dest="interactor_b_id_type",
                         action="store",
-                        required=True)
+                        default="uniprotac",
+                        required=False)
 
     parser.add_argument("-int_a_tax_id", "--interactor-a-tax-id",
                         help="<taxonomy ID of interactor A> [mandatory]",
@@ -42,32 +84,36 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-int_a_m_id", "--interactor-a-molecule-type-mi-id",
-                        help="<MI ID entity type of interactor A> [mandatory]",
+                        help="<MI ID entity type of interactor A> [optional]",
                         type=int,
                         dest="interactor_a_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_a_m_tn", "--interactor-a-molecule-type-mi-term-name",
-                        help="<MI term name entity type of interactor A> [mandatory]",
+                        help="<MI term name entity type of interactor A> [optional]",
                         type=str,
                         dest="interactor_a_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_b_m_id", "--interactor-b-molecule-type-mi-id",
-                        help="<MI ID entity type of interactor B> [mandatory]",
+                        help="<MI ID entity type of interactor B> [optional]",
                         type=int,
                         dest="interactor_b_molecule_type_mi_id",
                         action="store",
-                        required=True)
+                        default=326,
+                        required=False)
 
     parser.add_argument("-int_b_m_tn", "--interactor-b-molecule-type-mi-term-name",
-                        help="<MI term name entity type of interactor B> [mandatory]",
+                        help="<MI term name entity type of interactor B> [optional]",
                         type=str,
                         dest="interactor_b_molecule_type_mi_term_name",
                         action="store",
-                        required=True)
+                        default="protein",
+                        required=False)
 
     parser.add_argument("-int_det_m", "--interaction-detection-method",
                         help="<comma separated list of the detection methods of the interaction> [optional]",
@@ -109,7 +155,7 @@ def parse_args(args):
 def check_params(input_file):
 
     if not os.path.isfile(input_file):
-        sys.stderr.write(f"ERROR! the specified input file doesn't exists: {input_file}")
+        sys.stderr.write(f"ERROR MESSAGE: The specified input file does not exists: {input_file}")
         sys.exit(1)
 
 
@@ -121,9 +167,22 @@ def write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor
     json_dictionary = {}
     json_dictionary["interactor_a_id"] = line[0].split(":")[1].lower()
     json_dictionary["interactor_b_id"] = line[1].split(":")[1].lower()
-    json_dictionary["interactor_a_id_type"] = interactor_a_id_type
-    json_dictionary["interactor_b_id_type"] = interactor_b_id_type
-    json_dictionary["interactor_b_tax_id"] = int(line[10].split(":")[1].split("(")[0])
+
+    if line[0].split(":")[0] == "uniprotkb":
+        json_dictionary["interactor_a_id_type"] = interactor_a_id_type
+    else:
+        json_dictionary["interactor_a_id_type"] = line[0].split(":")[0].lower()
+
+    if line[1].split(":")[0] == "uniprotkb":
+        json_dictionary["interactor_b_id_type"] = interactor_b_id_type
+    else:
+        json_dictionary["interactor_b_id_type"] = line[1].split(":")[0].lower()
+
+    if line[10] == "-":
+        json_dictionary["interactor_b_tax_id"] = None
+    else:
+        json_dictionary["interactor_b_tax_id"] = int(line[10].split(":")[1].split("(")[0])
+
     json_dictionary["interactor_a_molecule_type_mi_id"] = interactor_a_molecule_type_mi_id
     json_dictionary["interactor_b_molecule_type_mi_id"] = interactor_b_molecule_type_mi_id
     json_dictionary["interactor_a_molecule_type_name"] = interactor_a_molecule_type_mi_term_name
@@ -142,7 +201,7 @@ def write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor
     else:
         json_dictionary["interaction_detection_methods_mi_id"] = [int(line[6].split(":")[2].split('"')[0].split(",")[0])]
 
-    if line[11][:1] == "-":
+    if line[11] == "-":
         json_dictionary["interaction_types_mi_id"] = []
 
         if interaction_type_mi_id:
@@ -214,7 +273,7 @@ def main():
         for line in f:
             line = line.strip().split('\t')
 
-            if species in line[9] and species in line[10]:
+            if species in line[9]:
                 write_to_output(line, interactor_a_id_type, interactor_b_id_type, interactor_a_molecule_type_mi_id,
                             interactor_a_molecule_type_mi_term_name, interactor_b_molecule_type_mi_id,
                             interactor_b_molecule_type_mi_term_name, interaction_detection_method,

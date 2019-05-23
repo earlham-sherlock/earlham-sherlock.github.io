@@ -13,19 +13,19 @@ Because of this, the user have to identify these parameters!
 
 -i, --input-file <path>                                       : path to an existing HINT db file [mandatory]
 
--int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A [mandatory]
+-int_a_id, --interactor-a-id-type <str>                       : ID type of interactor A, default: uniprotac [optional]
 
--int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B [mandatory]
+-int_b_id, --interactor-b-id-type <str>                       : ID type of interactor B, default: uniprotac [optional]
 
 -int_a_tax_id, --interactor-a-tax-id <int>                    : taxonomy ID of interactor A [mandatory]
 
--int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A [mandatory]
+-int_a_m_id, --interactor-a-molecule-type-mi-id <int>         : MI ID entity type of interactor A, default: 326 [optional]
 
--int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A [mandatory]
+-int_a_m_tn, --interactor-a-molecule-type-mi-term-name <str>  : MI term name entity type of interactor A, default: protein [optional]
 
--int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B [mandatory]
+-int_b_m_id, --interactor-b-molecule-type-mi-id <int>         : MI ID entity type of interactor B, default: 326 [optional]
 
--int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B [mandatory]
+-int_b_m_tn, --interactor-b-molecule-type-mi-term-name <str>  : MI term name entity type of interactor B, default: protein [optional]
 
 -int_det_m, --interaction-detection-method <int>              : comma separated list of the detection methods of the interaction [optional]
 
@@ -38,8 +38,7 @@ Because of this, the user have to identify these parameters!
 
 **Exit codes**
 
-Exit code 1: The specified input file doesn't exists!
-
+Exit code 1: The specified input file does not exists!
 
 **Notes**
 
@@ -61,12 +60,12 @@ uniprotkb:Q9NVH1	refseq:XP_006723867	entrezgene/locuslink:55735|refseq:NP_060668
 ```
 
 Terminal command:
-`python3 irefindex_db_loader.py -i example_files/9606.mitab.01-22-2018.txt -int_a_id uniprotac -int_b_id uniprotac -int_a_tax_id 9606 -int_a_m_id 0326 -int_b_m_id 0326 -int_a_m_tn protein -int_b_m_tn protein -int_det_m 0001 -int_type_id 0915 -pmid 18823568`
+`python3 irefindex_db_loader.py -i example_files/9606.mitab.01-22-2018.txt -int_a_tax_id 9606 -int_det_m 0001 -int_type_id 0915 -pmid 18823568`
 
 The output will be:
 - output file: interactor_a_tax_id=9606/irefindex_db.json
 ```
 {"interactor_a_id": "a0a024rb96", "interactor_b_id": "a0a024ra90", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [18], "interaction_types_mi_id": [407], "source_database_mi_id": [463, 923], "pmids": [19549727, 18823568]}
 {"interactor_a_id": "p40616", "interactor_b_id": "q9uil1-2", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [492], "interaction_types_mi_id": [915], "source_database_mi_id": [468, 923], "pmids": [11303027, 18823568]}
-{"interactor_a_id": "q9nvh1", "interactor_b_id": "xp_006723867", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "uniprotac", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [4], "interaction_types_mi_id": [915], "source_database_mi_id": [463, 923], "pmids": [26186194, 18823568]}
+{"interactor_a_id": "q9nvh1", "interactor_b_id": "xp_006723867", "interactor_a_id_type": "uniprotac", "interactor_b_id_type": "refseq", "interactor_b_tax_id": 9606, "interactor_a_molecule_type_mi_id": 326, "interactor_b_molecule_type_mi_id": 326, "interactor_a_molecule_type_name": "protein", "interactor_b_molecule_type_name": "protein", "interaction_detection_methods_mi_id": [4], "interaction_types_mi_id": [915], "source_database_mi_id": [463, 923], "pmids": [26186194, 18823568]}
 ```
