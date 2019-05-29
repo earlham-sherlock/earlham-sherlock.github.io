@@ -36,7 +36,16 @@ Sherlock is an open source data platform, developed in the [Korcsmaros Group](ht
   
 
 ### Your feedback
-... is very important, feel free to share it [with us](http://www.earlham.ac.uk/korcsmaros-group)! :)
+... is very important, feel free to share it [with us](http://www.earlham.ac.uk/tamas-korcsmaros)! :)
+
+
+### Authors
+The people behind the Sherlock project:
+* [Tamás Korcsmáros](http://www.earlham.ac.uk/tamas-korcsmaros)
+* [Máté Szalay-Bekő](http://www.earlham.ac.uk/mate-szalay-beko)
+* [Dávid Fazekas](http://www.earlham.ac.uk/david-fazekas)
+
+
 
 ---
 © 2018, 2019 Earlham Institute ([License](./sherlock_license.md))
