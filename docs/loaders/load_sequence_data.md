@@ -1,4 +1,4 @@
-[BACK](../readme.md) to main page
+[BACK](../../readme.md) to main page
 
 # Loading gene/protein sequence data to sherlock
 

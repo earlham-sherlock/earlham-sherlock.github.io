@@ -1,4 +1,4 @@
-[BACK](../readme.md) to main page
+[BACK](../../readme.md) to main page
 
 
 ### Fetching a sequence region around an SNP

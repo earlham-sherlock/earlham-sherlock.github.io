@@ -1,4 +1,4 @@
-[BACK](../readme.md) to main page
+[BACK](../../readme.md) to main page
 
 # Loading Interaction data to sherlock
 

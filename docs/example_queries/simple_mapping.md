@@ -1,4 +1,4 @@
-[BACK](../readme.md) to main page
+[BACK](../../readme.md) to main page
 
 
 ### Query Intact protein interactions and mapping them to uniprot IDs

@@ -1,4 +1,4 @@
-[BACK](../readme.md) to main page
+[BACK](../../readme.md) to main page
 
 
 ### Filtering human Intact interactions based on tissue
