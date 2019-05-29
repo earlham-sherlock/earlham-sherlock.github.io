@@ -25,3 +25,6 @@ LEFT JOIN master.uniprot_id_mapping_2018_09 mapper_b ON
 WHERE mapper_a.to_id_type = "uniprot" AND mapper_b.to_id_type = "uniprot"
 LIMIT 10;
 ```
+
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

@@ -20,3 +20,5 @@ WHERE tax_id = 9606 AND tissue_uberon_id = 955
 LIMIT 10;
 ```
 
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

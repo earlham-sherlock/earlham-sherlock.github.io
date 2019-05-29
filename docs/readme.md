@@ -36,4 +36,4 @@ More technical documentation and examples:
   
   
 ---
-(C) 2018, 2019 Earlham Institute ([License](doc/license.md))
+© 2018, 2019 Earlham Institute ([License](license.md))

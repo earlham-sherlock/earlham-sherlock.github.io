@@ -39,3 +39,6 @@ We are using a naming convention, to prefix the table name with the user who cre
 for it.
 
 In [this page](loaders/load_interaction_data.md) you can see how can you load molecular interaction data to Sherlock.
+
+---
+© 2018, 2019 Earlham Institute ([License](license.md))

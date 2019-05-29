@@ -36,3 +36,6 @@ WHERE intact.interactor_a_tax_id = 9606
   AND bgee_b.tissue_uberon_id = 955
 LIMIT 10;
 ```
+
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

@@ -181,3 +181,6 @@ but all these options require you to change the Docker containers we developed f
 between the public network and your presto cluster.
 * You can also setup an SSH tunnel with port forward between the main docker node and your machine, then you can use 
 presto CLI locally (this is the way how we are using Sherlock in our laptops now).
+
+---
+© 2018, 2019 Earlham Institute ([License](license.md))

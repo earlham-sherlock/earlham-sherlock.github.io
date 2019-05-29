@@ -27,4 +27,5 @@ FROM (
       );
 ```
 
-
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

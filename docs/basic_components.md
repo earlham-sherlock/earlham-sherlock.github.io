@@ -73,3 +73,5 @@ Presto manually and you can fire it up even on your laptop if needed. In the
 [deployment guide](deployment_guide.md) we will show how can you make a set of Linux VMs with docker 
 installed, then start a distributed Presto cluster by using Sherlock on top of Digital Oceans.
 
+---
+© 2018, 2019 Earlham Institute ([License](license.md))

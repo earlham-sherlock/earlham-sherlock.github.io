@@ -41,4 +41,5 @@ WHERE intact.interactor_a_id IN ('ensg11867234247', 'ensg11867234247', 'ensg2382
 ```
 
 
-
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

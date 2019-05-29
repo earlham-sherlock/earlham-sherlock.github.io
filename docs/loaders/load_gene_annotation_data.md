@@ -92,3 +92,5 @@ CREATE TABLE master.annotations_hg38_gene_intron WITH (
 In the end we will have the master annotation files in the data lake, like:
 `s3://sherlock/master_zone/annotations_hg38_gene_intron/chromosome=chr13/something.orc`
 
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

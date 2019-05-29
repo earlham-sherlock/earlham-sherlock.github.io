@@ -76,3 +76,6 @@ CREATE TABLE master.uniprot_id_mapping_2018_11 WITH (
 
 In the end we will have the master interaction files in the data lake, like:
 `s3://sherlock/master_zone/uniprot_id_mapping_2018_11/tax_id=9606/from_id_type=uniprotac/something.orc`
+
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

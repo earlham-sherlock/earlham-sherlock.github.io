@@ -31,3 +31,6 @@ export SHERLOCK_CONF=`pwd`/conf/config-example_many_workers_external-s3.conf
  
 ./metastore_restore.sh sherlock_metastore_backups/backup_2019-05-22.dump
 ```
+
+---
+© 2018, 2019 Earlham Institute ([License](license.md))

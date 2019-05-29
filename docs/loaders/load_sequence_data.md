@@ -71,3 +71,7 @@ CREATE TABLE master.hg_38_p12 WITH (
 
 In the end we will have the genome files in the data lake, like:
 `s3://sherlock/master_zone/hg_38_p12/chr=chr11/chromosome.orc`
+
+
+---
+© 2018, 2019 Earlham Institute ([License](../license.md))

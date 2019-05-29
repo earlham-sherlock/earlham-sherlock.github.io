@@ -1,8 +1,5 @@
-TODO: backupservice:
-+ automaric peridical save to s3
-+ manual restore from s3 save + restart metastore service
+see: 
 
-
-## prerequisites
-
-- install `bc` (we calculate memory settings with it): `sudo apt-get install bc`
+* [Under the hood: basic components](../docs/basic_components.md)
+* [Deployment guide](../docs/deployment_guide.md)
+* [Backup and restore the metadata](../docs/backup_restore.md)
