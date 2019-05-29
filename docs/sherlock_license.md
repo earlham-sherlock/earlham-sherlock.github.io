@@ -1,6 +1,6 @@
 [BACK](./readme.md) to main page
 
-##Sherlock license
+## Sherlock license
 
 **Copyright 2018,2019 Earlham Institute, Norwich, UK**
 

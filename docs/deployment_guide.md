@@ -185,4 +185,4 @@ between the public network and your presto cluster.
 presto CLI locally (this is the way how we are using Sherlock in our laptops now).
 
 ---
-© 2018, 2019 Earlham Institute ([License](sherlock_license.md))
+© 2018, 2019 Earlham Institute ([License](./sherlock_license.md))

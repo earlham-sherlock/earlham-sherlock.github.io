@@ -76,4 +76,4 @@ Presto manually and you can fire it up even on your laptop if needed. In the
 installed, then start a distributed Presto cluster by using Sherlock on top of Digital Oceans.
 
 ---
-© 2018, 2019 Earlham Institute ([License](sherlock_license.md))
+© 2018, 2019 Earlham Institute ([License](./sherlock_license.md))
