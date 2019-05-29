@@ -1,3 +1,5 @@
+[BACK](./readme.md) to main page
+
 # Backup and restore metadata
 
 In Sherlock, almost all the data is kept in S3. This also means, that you can stop and start Presto any 
@@ -33,4 +35,4 @@ export SHERLOCK_CONF=`pwd`/conf/config-example_many_workers_external-s3.conf
 ```
 
 ---
-© 2018, 2019 Earlham Institute ([License](license.md))
+© 2018, 2019 Earlham Institute ([License](./license.md))
