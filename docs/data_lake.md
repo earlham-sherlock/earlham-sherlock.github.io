@@ -1,5 +1,6 @@
-# Data lake structure and schema initialization in Sherlock
+[BACK](./readme.md) to main page
 
+# Data lake structure and schema initialization in Sherlock
 
 You can use Sherlock to execute queries on top of a Data Lake, where all the data is stored in 'folder-like' structures. 
 Having well defined folder structure helps you to organize your data better.  Our suggestion 
@@ -41,4 +42,4 @@ for it.
 In [this page](loaders/load_interaction_data.md) you can see how can you load molecular interaction data to Sherlock.
 
 ---
-© 2018, 2019 Earlham Institute ([License](license.md))
+© 2018, 2019 Earlham Institute ([License](sherlock_license.md))

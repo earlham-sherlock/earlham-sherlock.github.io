@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 # Loading gene annotation data to sherlock
 
 **STEP 1: store raw files**
@@ -93,4 +95,4 @@ In the end we will have the master annotation files in the data lake, like:
 `s3://sherlock/master_zone/annotations_hg38_gene_intron/chromosome=chr13/something.orc`
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

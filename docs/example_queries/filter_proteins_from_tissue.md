@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 
 ### Select proteins from a given human tissue
 
@@ -21,4 +23,4 @@ LIMIT 10;
 ```
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

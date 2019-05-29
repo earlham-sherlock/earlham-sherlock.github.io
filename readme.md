@@ -4,5 +4,5 @@ Sherlock is a Data lake and query engine solution for Korcsmaros Group @ Earlham
 
 For the detailed documentation, please see the [official webpage](https://netbiol.github.io/sherlock)
 
-[License](docs/license.md)
+[License](docs/sherlock_license.md)
 

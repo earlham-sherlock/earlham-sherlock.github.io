@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 
 ### Enrich protein list with internal interactions
 
@@ -42,4 +44,4 @@ WHERE intact.interactor_a_id IN ('ensg11867234247', 'ensg11867234247', 'ensg2382
 
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 # Loading gene/protein sequence data to sherlock
 
 **STEP 1: store raw files**
@@ -74,4 +76,4 @@ In the end we will have the genome files in the data lake, like:
 
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

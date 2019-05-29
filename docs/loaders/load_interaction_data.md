@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 # Loading Interaction data to sherlock
 
 
@@ -109,4 +111,4 @@ In the end we will have the master interaction files in the data lake, like:
 `s3://sherlock/master_zone/intact_2018_10_04/interactor_a_tax_id=9606/something.orc`
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

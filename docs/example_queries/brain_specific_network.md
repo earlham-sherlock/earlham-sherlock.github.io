@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 
 ### Fetching a sequence region around an SNP
 
@@ -28,4 +30,4 @@ FROM (
 ```
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))

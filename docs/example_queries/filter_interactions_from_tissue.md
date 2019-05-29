@@ -1,3 +1,5 @@
+[BACK](../readme.md) to main page
+
 
 ### Filtering human Intact interactions based on tissue
 
@@ -38,4 +40,4 @@ LIMIT 10;
 ```
 
 ---
-© 2018, 2019 Earlham Institute ([License](../license.md))
+© 2018, 2019 Earlham Institute ([License](../sherlock_license.md))
