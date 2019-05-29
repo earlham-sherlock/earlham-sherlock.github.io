@@ -36,7 +36,7 @@ Sherlock is an open source data platform, developed in the [Korcsmaros Group](ht
   
 
 ### Your feedback
-... is very important for us, feel free to send it to [us](http://www.earlham.ac.uk/korcsmaros-group)! :)
+... is very important, feel free to share it [with us](http://www.earlham.ac.uk/korcsmaros-group)! :)
 
 ---
 © 2018, 2019 Earlham Institute ([License](./sherlock_license.md))
