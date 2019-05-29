@@ -1,17 +1,18 @@
 # Loading Interaction data to sherlock
 
 
-## STEP 1: store raw files
+**STEP 1: store raw files**
 copy raw database files to S3 for each database, like:
-- `s3://sherlock-korcsmaros-group/raw_zone/intact_2018_10_04`
-- `s3://sherlock-korcsmaros-group/raw_zone/string_10_5`
+- `s3://sherlock/raw_zone/omnipath_0_7_111`
+- `s3://sherlock/raw_zone/intact_2018_10_04`
+- `s3://sherlock/raw_zone/string_10_5`
 
 ---
 
-## STEP 2: convert to json
+**STEP 2: convert to json**
 
 Generate and copy json files to landing zone, partitioned by interactor_a_tax_id, like:
-`s3://sherlock-korcsmaros-group/landing_zone/intact_2018_10_04/interactor_a_tax_id=9606/intact.json`
+`s3://sherlock/landing_zone/intact_2018_10_04/interactor_a_tax_id=9606/intact.json`
 (the name of the file is arbitrary, presto will read all the files from the directory when it queries the partition)
 
 And in the json we have single json records per line.
@@ -22,8 +23,8 @@ line, and the lines are separated by only a new-line character, and no comma).
 {
    "interactor_a_id": "ensg11867234247",
    "interactor_b_id": "ensg98236453842",
-   "interactor_a_id_type": "Ensembl",
-   "interactor_b_id_type": "Ensembl",
+   "interactor_a_id_type": "ensembl",
+   "interactor_b_id_type": "ensembl",
    "interactor_b_tax_id": 9606,
    "interactor_a_molecula_type_mi_id": 250,
    "interactor_b_molecula_type_mi_id": 250,
@@ -54,10 +55,12 @@ Use the following syntax when crating the values for each attribute:
 - source_databases_mi_id: [mi_id int, ...], optional, default: empty list
 - pmids: [ pmid int, ...], optional, default: empty list
 
+[There are](https://github.com/NetBiol/sherlock/tree/master/loaders) many scripts we made that makes the json conversion for 
+the interaction database files.
 
 ---
 
-## STEP 3: register landing tables in Presto:
+**STEP 3: register landing tables in Presto**
 
 For each molecular interaction database we need to register a table in the landing zone:
 
@@ -80,12 +83,20 @@ CREATE TABLE landing.intact_2018_10_04 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['interactor_a_tax_id'],
-   external_location = 'S3://sherlock-korcsmaros-group/landing_zone/intact_2018_10_04' );
+   external_location = 'S3://sherlock/landing_zone/intact_2018_10_04' );
 ```
 
 ---
 
-## STEP 4: convert to ORC in the master zone (+ finer partitioning & total ordering):
+**STEP 4:  use hive CLI to refresh the partition list**  
+
+```
+msck repair table landing.intact_2018_10_04;
+```
+
+---
+
+**STEP 5: convert to ORC in the master zone (+ finer partitioning & total ordering)**
 
 ```
 CREATE TABLE master.intact_2018_10_04 WITH (
@@ -95,4 +106,4 @@ CREATE TABLE master.intact_2018_10_04 WITH (
 ```
 
 In the end we will have the master interaction files in the data lake, like:
-`s3://sherlock-korcsmaros-group/master_zone/intact_2018_10_04/interactor_a_tax_id=9606/something.orc`
+`s3://sherlock/master_zone/intact_2018_10_04/interactor_a_tax_id=9606/something.orc`

@@ -1,15 +1,16 @@
 # Loading localization data to sherlock
 
-## STEP 1: store raw files
+**STEP 1: store raw files**
+
 copy raw tissue database files to S3 for each database.
-E.g. for Human Protein Atlas v18, upload it to: `s3://sherlock-korcsmaros-group/raw_zone/hpa_18`
+E.g. for Human Protein Atlas v18, upload it to: `s3://sherlock/raw_zone/hpa_18`
 
 ---
 
-## STEP 2: convert to json
+**STEP 2: convert to json**
 
 Generate and copy json files to landing zone, like:
-`s3://sherlock-korcsmaros-group/landing_zone/hpa_18/tax_id=9606/tissue.json`
+`s3://sherlock/landing_zone/hpa_18/tax_id=9606/tissue.json`
 (the name of the file is arbitrary, presto will read all the files from the directory when it queries the partition)
 
 And in the json we have single json records per line. The lines are separated by only a new-line character, and no comma).
@@ -30,9 +31,11 @@ Use the following syntax when crating the values for each attribute:
 - source_db: UniProtKB DBref - if the source db is present in UniProtKB DBref, otherwise just put the database name, mandatory
 - score: float value between 0 and 1, optional (just skip the attribute if it is not present)
 
+[This is](https://github.com/NetBiol/sherlock/tree/master/loaders/bgee) our script that makes the database conversion.
+
 ---
 
-## STEP 3: register landing tables in Presto:
+**STEP 3: register landing tables in Presto**
 
 For each molecular interaction database we need to register a table in the landing zone:
 
@@ -48,12 +51,20 @@ CREATE TABLE landing.hpa_18 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['tax_id'],
-   external_location = 'S3://sherlock-korcsmaros-group/landing_zone/hpa_18' );
+   external_location = 'S3://sherlock/landing_zone/hpa_18' );
 ```
 
 ---
 
-## STEP 4: convert to ORC in the master zone (+ finer partitioning & total ordering):
+**STEP 4:  use hive CLI to refresh the partition list**  
+
+```
+msck repair table landing.hpa_18;
+```
+
+---
+
+**STEP 5: convert to ORC in the master zone (+ finer partitioning & total ordering)**
 
 ```
 CREATE TABLE master.hpa_18 WITH (
@@ -63,4 +74,4 @@ CREATE TABLE master.hpa_18 WITH (
 ```
 
 In the end we will have the master interaction files in the data lake, like:
-`s3://sherlock-korcsmaros-group/master_zone/hpa_18/tax_id=9606/something.orc`
+`s3://sherlock/master_zone/hpa_18/tax_id=9606/something.orc`
