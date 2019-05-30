@@ -57,5 +57,5 @@ docker service create  \
   --env MEMORY_HEAP_HEADROOM_PER_NODE="${SHERLOCK_MEMORY_HEAP_HEADROOM_PER_NODE}" \
   --env MAX_WORKER_THREADS="${SHERLOCK_MAX_WORKER_THREADS}" \
   --env JVM_XMX="${SHERLOCK_PRESTO_PROCESS_XMX}" \
-  sherlockdatalake/presto:0_219a
+  sherlockdatalake/presto:0_220
 

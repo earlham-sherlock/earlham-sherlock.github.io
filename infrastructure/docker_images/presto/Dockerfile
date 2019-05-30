@@ -1,6 +1,6 @@
 FROM sherlockdatalake/base:8u212
 
-ENV PRESTO_VERSION 0.219
+ENV PRESTO_VERSION 0.220
 
 RUN mkdir /opt/presto && \
     curl https://repo1.maven.org/maven2/com/facebook/presto/presto-server/${PRESTO_VERSION}/presto-server-${PRESTO_VERSION}.tar.gz -o presto-server.tar.gz && \
