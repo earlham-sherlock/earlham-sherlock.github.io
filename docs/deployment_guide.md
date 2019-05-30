@@ -27,7 +27,7 @@ in the data lake will end up in a local folder on your machine. Of course it is 
 setup in production, as all your data can be lost easily and also you will have very limited analytical 
 capacity. But this setup is very practical, as it can be executed on a single laptop and you can test your 
 analytical queries in this way. We recommend you to use a relatively powerful laptop, with at least a 
-dual-core CPU and 16 GB RAM, as around half of these resources can be consumed by Sherlock.
+dual-core CPU and 12 GB RAM, as around half of these resources can be consumed by Sherlock.
 
 Deploying your sherlock sandbox cluster:
 ```
@@ -41,13 +41,15 @@ export SHERLOCK_CONF=`pwd`/conf/config-example_sandbox_local-s3.conf
 ./start_postgres.sh
 ./start_metastore.sh
 ./start_presto_coordinator.sh
-./start_presto_workers.sh
 ```
 
 To stop the whole Sherlock stack, you can use the `stop_sherlock.sh` command.
 
 You will need to use the very same `start_` scripts in case of any kind of deployments. 
-(With one exception: when you use S3 storage in the Cloud, you won’t need to use `start_local_s3.sh`). 
+With two exceptions: 
+* when you use S3 storage in the Cloud, you won’t need to use `start_local_s3.sh`
+* when you deploy a larger cluster, you will also add worker presto instances, so you will need to execute `start_presto_workers.sh` as well
+ 
 The main difference between the different deployments are controlled in the config file. By changing 
 the config file or exporting a different config file, you can change the size of the cluster and also 
 other important parameters.
@@ -55,7 +57,7 @@ other important parameters.
 You can check the full config file for the local sherlock sandbox 
 here: https://github.com/NetBiol/sherlock/blob/master/infrastructure/conf/config-example_sandbox_local-s3.conf
 
-In this config we specify that we will use a single Presto Worker, we assign very minimal resources 
+In this config we specify that we will use a single Presto Coordinator (and no workers), we assign very minimal resources 
 to Presto, and we will use a local S3 service which will expose a local folder on our machine for Sherlock.
 
 If everything works fine, you will be able to open the the Presto UI in your browser: http://localhost:8089 
@@ -109,7 +111,6 @@ export SHERLOCK_CONF=`pwd`/conf/config-example_sandbox_external-s3.conf
 ./start_postgres.sh
 ./start_metastore.sh
 ./start_presto_coordinator.sh
-./start_presto_workers.sh
 ```
 
 ## Deploying a larger Sherlock cluster 

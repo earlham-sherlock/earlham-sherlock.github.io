@@ -49,8 +49,8 @@ will give more details in the [following page](data_lake.md).
 
 The Query Engines (like Hive, Impala, Spark Sql or Presto) are distributed, mostly stateless and very 
 scalable softwares, which can connect to your Data Lake, read and combine your data stored there and 
-execute different analytical queries on your data. We are using Presto, as it has good performance 
-and it is maybe the easiest to deploy and maintain.
+execute different analytical queries on your data. We are using [Presto](https://prestodb.github.io/), 
+as it has good performance and it is maybe the easiest to deploy and maintain.
 
 With Presto, you can formalize analytical questions using SQL (Structured Query Language). SQL is the 
 _de facto_ standard way to express simple queries on top of relational data. If you are not familiar 
