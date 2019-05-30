@@ -2,3 +2,9 @@ theme: jekyll-theme-cayman
 show_downloads: true
 title: sherlock
 description: an open source data platform, developed in the Korcsmaros Group to store, analyze and integrate bioinformatics data
+github:
+  repository_url: https://github.com/earlham-sherlock/earlham-sherlock.github.io
+  is_project_page: true
+  repository_name: sherlock
+  owner_url: http://www.earlham.ac.uk
+  owner_name: Earlham Institute
