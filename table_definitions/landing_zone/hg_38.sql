@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS landing.hg_38 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['chr'],
-   external_location = 's3a://sherlock/landing_zone/hg_38' );
+   external_location = 's3a://sherlock/landing_zone/hg_38');
 
 -- don't forget to refresh the partition list!

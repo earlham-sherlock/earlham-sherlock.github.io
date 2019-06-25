@@ -16,6 +16,6 @@ CREATE TABLE IF NOT EXISTS landing.omnipath_0_7_111 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['interactor_a_tax_id'],
-   external_location = 's3a://sherlock/landing_zone/omnipath_0.7.111' );
+   external_location = 's3a://sherlock/landing_zone/omnipath_0_7_111');
 
 -- don't forget to refresh the partition list!

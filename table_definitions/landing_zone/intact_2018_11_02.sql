@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS landing.intact_2018_10_04 (
+CREATE TABLE IF NOT EXISTS landing.intact_2018_11_02 (
    interactor_a_id VARCHAR,
    interactor_b_id VARCHAR,
    interactor_a_id_type VARCHAR,
@@ -16,6 +16,6 @@ CREATE TABLE IF NOT EXISTS landing.intact_2018_10_04 (
 ) WITH (
    format            = 'JSON',
    partitioned_by    = ARRAY['interactor_a_tax_id'],
-   external_location = 's3a://sherlock/landing_zone/intact_2018_11_02' );
+   external_location = 's3a://sherlock/landing_zone/intact_2018_11_02');
 
 -- don't forget to refresh the partition list!
