@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS landing.bgee_14_0 (
    score DECIMAL(18, 8),
    tax_id INT
 ) WITH (
-   format            = ''JSON'',
-   partitioned_by    = ARRAY[''tax_id''],
-   external_location = ''s3a://sherlock/landing_zone/bgee_14_0'' );
+   format            = 'JSON',
+   partitioned_by    = ARRAY['tax_id'],
+   external_location = 's3a://sherlock/landing_zone/bgee_14_0');
 
 -- don't forget to refresh the partition list!
 
