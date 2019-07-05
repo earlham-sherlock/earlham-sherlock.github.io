@@ -2,10 +2,10 @@
 set -e
 
 echo "generating yanagishima.properties..."
-mv /app/conf/yanagishima.properties /app/conf/yanagishima.properties_bak
-envsubst < /app/conf/yanagishima.properties_bak > /app/conf/yanagishima.properties
-rm  /app/conf/yanagishima.properties_bak
-#cat /app/conf/yanagishima.properties
+mv /app/yanagishima/conf/yanagishima.properties /app/yanagishima/conf/yanagishima.properties_bak
+envsubst < /app/yanagishima/conf/yanagishima.properties_bak > /app/yanagishima/conf/yanagishima.properties
+rm  /app/yanagishima/conf/yanagishima.properties_bak
+#cat /app/yanagishima/conf/yanagishima.properties
 
 yanagishima_dir=/app/yanagishima
 
