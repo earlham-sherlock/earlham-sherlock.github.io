@@ -34,12 +34,10 @@ docker service create  \
   --with-registry-auth  \
   --name ${SERVICE_NAME}  \
   --container-label ${SERVICE_NAME}  \
-  --reserve-memory ${SHERLOCK_WEBUI_MEMORY_RESERVATION} \
-  --limit-memory ${SHERLOCK_WEBUI_MEMORY_LIMIT} \
-  --reserve-cpu ${SHERLOCK_WEBUI_CPU_CORES} \
-  --limit-cpu ${SHERLOCK_WEBUI_CPU_CORES} \
+  --reserve-memory 256mb \
+  --limit-memory 1gb \
   --network sherlock-overlay \
-  --publish published=${SHERLOCK_PRESTO_PORT},target=8080 \
+  --publish published=8090,target=8080 \
   --env WEBUI_YANAGISHIMA_PORT="8080" \
   --env WEBUI_YANAGISHIMA_MAX_QUERY_TIME="1800" \
   --env WEBUI_YANAGISHIMA_MAX_FILE_SIZE="1073741824" \
