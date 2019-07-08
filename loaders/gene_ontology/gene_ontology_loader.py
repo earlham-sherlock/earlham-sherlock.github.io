@@ -3,15 +3,8 @@ import sys
 import os
 import re
 import json
+from collections import defaultdict
 from time import strftime
-
-
-def progress_bar(iteration, total, barLength):
-   percent = int((iteration / total) * 100)
-   bar_fill = '=' * percent
-   bar_empty = ' ' * (barLength - percent)
-   actual = bar_fill + bar_empty
-   sys.stdout.write(f'\r[{actual}] {iteration}/{total} id processed | {percent}%')
 
 
 def parse_args(args):
@@ -52,12 +45,12 @@ def check_params(input_file):
         sys.exit(2)
 
 
-def get_terms_per_line(input_file, intermedier_file, go_ids):
+def get_terms_per_line(input_file, helper_file, go_ids):
 
     array = []
     id_pattern = '(id: GO:([0-9]{7}))'
 
-    with open(input_file, 'r') as f, open(intermedier_file, 'w') as out:
+    with open(input_file, 'r') as f, open(helper_file, 'w') as out:
 
         term_array = []
 
@@ -95,13 +88,13 @@ def get_terms_per_line(input_file, intermedier_file, go_ids):
                     out.write("|".join(member) + '\n')
 
 
-def get_direct_parents(go_ids, intermedier_file):
+def get_direct_parents(go_ids, helper_file):
 
     parents_dictionary = {}
     pattern = '(is_a: GO:([0-9]{7}))'
     pattern2 = '(part_a: GO:([0-9]{7}))'
 
-    with open(intermedier_file, 'r') as f2:
+    with open(helper_file, 'r') as f2:
 
         for row in f2:
             row = row.strip()
@@ -147,7 +140,7 @@ def get_direct_children(parents_dictionary):
 
 def get_all_relations(go_ids, given_dictionary):
 
-    all_relations = {}
+    all_relations = defaultdict(list)
 
     for member in go_ids:
 
@@ -160,26 +153,28 @@ def get_all_relations(go_ids, given_dictionary):
 
             else:
 
-                if keys not in all_relations:
-                    all_relations[keys] = []
-
                 for v in values:
-                    if v not in all_relations_to_check:
-                        all_relations_to_check.append(v)
-                    if v not in all_relations[keys]:
-                        all_relations[keys].append(v)
+                    all_relations_to_check.append(v)
+                    all_relations[keys].append(v)
+                all_relations_to_check = list(set(all_relations_to_check))
 
             for x in all_relations_to_check:
+
+                all_relations_to_check_add = []
 
                 for ke, val in given_dictionary.items():
 
                     if x == ke:
 
                         for m in val:
-                            if m not in all_relations_to_check:
-                                all_relations_to_check.append(m)
-                            if m not in all_relations[keys]:
-                                all_relations[keys].append(m)
+                            all_relations_to_check.append(m)
+                            all_relations[keys].append(m)
+
+                all_relations_to_check.extend(all_relations_to_check_add)
+
+    for k, v in all_relations.items():
+
+        all_relations[k] = list(set(v))
 
     return all_relations
 
@@ -193,15 +188,15 @@ def get_relatives_ids(id, dictionary):
         if id == keys:
             for value in values:
                 if value not in array:
-                    array.append(value)
+                    array.append(int(value))
 
     return array
 
 
-def write_to_output(intermedier_file, parents_dictionary, children_dictionary, all_parents_dictionary,
+def write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file):
 
-    with open(intermedier_file, 'r') as f, open(output_file, 'w') as out:
+    with open(helper_file, 'r') as f, open(output_file, 'w') as out:
 
         for line in f:
             line = line.strip().split('|')
@@ -211,7 +206,7 @@ def write_to_output(intermedier_file, parents_dictionary, children_dictionary, a
             namespace = line[2].split(" ")[1]
 
             json_dictionary = {}
-            json_dictionary["id"] = id
+            json_dictionary["id"] = int(id)
             json_dictionary["id_type"] = "GO"
             json_dictionary["name"] = name
             json_dictionary["namespace"] = namespace
@@ -227,15 +222,15 @@ def write_to_output(intermedier_file, parents_dictionary, children_dictionary, a
                 alt_ids = re.findall(alt_id_pattern, columns)
 
                 if alt_ids:
-                    json_dictionary["alt_ids"].append(alt_ids[0][1])
+                    json_dictionary["alt_ids"].append(int(alt_ids[0][1]))
 
-            directed_parents_array = get_relatives_ids(id, parents_dictionary)
-            if len(directed_parents_array) > 0:
-                json_dictionary["direct_parents"] = directed_parents_array
+            if id in parents_dictionary:
+                for member_in_parents_dictionary in parents_dictionary[id]:
+                    json_dictionary["direct_parents"].append(int(member_in_parents_dictionary))
 
-            directed_children_array = get_relatives_ids(id, children_dictionary)
-            if len(directed_children_array) > 0:
-                json_dictionary["direct_children"] = directed_children_array
+            if id in children_dictionary:
+                for member_in_children_dictionary in children_dictionary[id]:
+                    json_dictionary["direct_children"].append(int(member_in_children_dictionary))
 
             all_parents_array = get_relatives_ids(id, all_parents_dictionary)
             if len(all_parents_array) > 0:
@@ -259,14 +254,16 @@ def main():
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
     go_ids = []
-    intermedier_file = os.path.join(working_directory, "terms_per_line.txt")
+    helper_file = os.path.join(working_directory, "helper.txt")
+    abspath_helper_file = os.path.abspath(helper_file)
     output_file = os.path.join(working_directory, "go.json")
-    absolute_path_output_file = os.path.abspath(output_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an intermedier (helper) file')
-    get_terms_per_line(input_file, intermedier_file, go_ids)
+    abspath_output_file = os.path.abspath(output_file)
+
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an intermedier (helper) file: {abspath_helper_file}')
+    get_terms_per_line(input_file, helper_file, go_ids)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
-    parents_dictionary = get_direct_parents(go_ids, intermedier_file)
+    parents_dictionary = get_direct_parents(go_ids, helper_file)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed children of each term')
     children_dictionary = get_direct_children(parents_dictionary)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all parents of each term')
@@ -274,12 +271,12 @@ def main():
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all children of each term')
     all_children_dictionary = get_all_relations(go_ids, children_dictionary)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing results to output file: {absolute_path_output_file}')
-    write_to_output(intermedier_file, parents_dictionary, children_dictionary, all_parents_dictionary,
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing results to output file: {abspath_output_file}')
+    write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the intermedier file')
-    os.remove(intermedier_file)
+    os.remove(helper_file)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Gene Ontology Loader script finished successfully!')
 
 
