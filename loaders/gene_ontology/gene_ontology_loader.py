@@ -140,55 +140,38 @@ def get_direct_children(parents_dictionary):
 
 def get_all_relations(go_ids, given_dictionary):
 
-    all_relations = defaultdict(list)
+    return_relations = defaultdict(list)
 
-    for member in go_ids:
+    for term in go_ids:
 
-        for keys, values in given_dictionary.items():
+        all_relations = []
+        if term in given_dictionary:
+            all_relations.extend(given_dictionary[term])
+        all_relations_to_check = []
+        if term in given_dictionary:
+            all_relations_to_check.extend(given_dictionary[term])
 
+        while len(all_relations_to_check) > 0:
+            all_relations_to_check_add = []
+            for relations_to_check in all_relations_to_check:
+                if relations_to_check in given_dictionary:
+                    all_relations_to_check_add.extend(given_dictionary[relations_to_check])
             all_relations_to_check = []
+            all_relations_to_check = list(set(all_relations_to_check_add))
+            all_relations.extend(all_relations_to_check)
+        return_relations[term] = list(set(all_relations))
 
-            if member != keys:
-                continue
-
-            else:
-
-                for v in values:
-                    all_relations_to_check.append(v)
-                    all_relations[keys].append(v)
-                all_relations_to_check = list(set(all_relations_to_check))
-
-            for x in all_relations_to_check:
-
-                all_relations_to_check_add = []
-
-                for ke, val in given_dictionary.items():
-
-                    if x == ke:
-
-                        for m in val:
-                            all_relations_to_check.append(m)
-                            all_relations[keys].append(m)
-
-                all_relations_to_check.extend(all_relations_to_check_add)
-
-    for k, v in all_relations.items():
-
-        all_relations[k] = list(set(v))
-
-    return all_relations
+    return return_relations
 
 
 def get_relatives_ids(id, dictionary):
 
     array = []
 
-    for keys, values in dictionary.items():
-
-        if id == keys:
-            for value in values:
-                if value not in array:
-                    array.append(int(value))
+    if id in dictionary:
+        for value in dictionary[id]:
+            if value not in array:
+                array.append(int(value))
 
     return array
 
