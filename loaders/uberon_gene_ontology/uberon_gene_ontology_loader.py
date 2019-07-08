@@ -95,7 +95,7 @@ def get_direct_parents(ids, helper_file):
 
     parents_dictionary = {}
     pattern = '(is_a: ([A-Za-z]{2,9}):([0-9]{7}))'
-    pattern2 = '(part_a: ([A-Za-z]{2,9}):([0-9]{7}))'
+    pattern2 = '(part_of ([A-Za-z]{2,9}):([0-9]{7}))'
 
     with open(helper_file, 'r') as f2:
 
@@ -116,6 +116,10 @@ def get_direct_parents(ids, helper_file):
                         if len(parents) > 0:
                             if parents[i][1] not in parents_dictionary[identifier]:
                                 parents_dictionary[identifier].append(parents[i][0].split(" ")[1])
+
+                    for i in range(0, len(parents2)):
+                        if identifier not in parents_dictionary:
+                            parents_dictionary[identifier] = []
 
                         if len(parents2) > 0:
                             if parents2[i][1] not in parents_dictionary[identifier]:
