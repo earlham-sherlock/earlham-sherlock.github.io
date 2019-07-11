@@ -10,7 +10,30 @@ from time import strftime
 def parse_args(args):
     help_text = \
         """
-        === Gene Ontology Loader script ===
+        === Gene Ontology Loader script ===**Description:**
+
+        This script takes an OBO Gene Ontology (GO) file, which contains gene ontologies
+        and converts it to Sherlock compatible JSON format.
+        
+        The working directory can be a non-existent folder as well!
+        
+        
+        **Parameters:**
+        
+        -i, --input-file <path>         : path to an existing .obo file [mandatory]
+        
+        -wd, --working-directory        : path to a folder, where the script can work in [mandatory]
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
+        Exit code 2: The specified input file is not an OBO file!
+        
+        
+        **Useful links**
+        
+        Information about the relationship between ontology terms: http://geneontology.org/docs/ontology-relations/
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -23,7 +46,7 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-wd", "--working-directory",
-                        help="<path to an existing folder, where the script can work in> [mandatory]",
+                        help="<path to a folder, where the script can work in> [mandatory]",
                         type=str,
                         dest="working_directory",
                         action="store",
@@ -246,7 +269,7 @@ def main():
     output_file = os.path.join(working_directory, "go.json")
     abspath_output_file = os.path.abspath(output_file)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an intermedier (helper) file: {abspath_helper_file}')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an helper file: {abspath_helper_file}')
     get_terms_per_line(input_file, helper_file, go_ids)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
@@ -262,7 +285,7 @@ def main():
     write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the intermedier file')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the helper file')
     os.remove(helper_file)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Gene Ontology Loader script finished successfully!')
 
