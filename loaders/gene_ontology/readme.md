@@ -7,7 +7,7 @@ This script takes an OBO Gene Ontology (GO) file, which contains gene ontologies
 and converts it to Sherlock compatible JSON format.
 
 The working directory can be a non-existent folder as well!
-c
+
 
 **Parameters:**
 
