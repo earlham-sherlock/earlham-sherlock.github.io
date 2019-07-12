@@ -10,7 +10,27 @@ from time import strftime
 def parse_args(args):
     help_text = \
         """
-        === Uberon Gene Ontology Loader script ===
+        === Uberon Ontology Loader script ===
+        
+        **Description:**
+
+        This script takes an OBO Uberon Ontology (GO) file, which contains ontologies
+        and converts it to Sherlock compatible JSON format.
+        
+        The working directory can be a non-existent folder as well!
+        
+        
+        **Parameters:**
+        
+        -i, --input-file <path>         : path to an existing .obo file [mandatory]
+        
+        -wd, --working-directory <path> : path to a folder, where the script can work in [mandatory]
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
+        Exit code 2: The specified input file is not an OBO file!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -192,11 +212,16 @@ def write_to_output(helper_file, parents_dictionary, children_dictionary, all_pa
             line = line.strip().split('|')
 
             id = line[0].split(" ")[1]
-            name = line[1].split(" ")[1]
+            name = line[1].split(":")[1].replace(" ", "")
 
             json_dictionary = {}
             json_dictionary["id"] = id.lower()
-            json_dictionary["name"] = name
+
+            if "name" in line[1]:
+                json_dictionary["name"] = name
+            else:
+                json_dictionary["name"] = None
+
             json_dictionary["alt_ids"] = []
             json_dictionary["direct_parents"] = []
             json_dictionary["direct_children"] = []
@@ -246,7 +271,7 @@ def main():
     output_file = os.path.join(working_directory, "go.json")
     abspath_output_file = os.path.abspath(output_file)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an intermedier (helper) file: {abspath_helper_file}')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an helper file: {abspath_helper_file}')
     get_terms_per_line(input_file, helper_file, ids)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
@@ -262,9 +287,9 @@ def main():
     write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the intermedier file')
-    os.remove(helper_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Uberon Gene Ontology Loader script finished successfully!')
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the helper file')
+    # os.remove(helper_file)
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Uberon Ontology Loader script finished successfully!')
 
 
 if __name__ == '__main__':
