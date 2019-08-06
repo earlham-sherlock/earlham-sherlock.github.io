@@ -10,6 +10,29 @@ def parse_args(args):
     help_text = \
         """
         === Sherlock Ortholog Mapper Loader script ===
+        
+        
+        **Description:**
+
+        This script takes a TSV file, which contains protein orthologes
+        between species and converts it to Sherlock compatible JSON format.
+        
+        
+        **Parameters:**
+        
+        -i, --input-file-list <list>          : comma separated paths to existing files [mandatory]
+        
+        -f, --from-tax-id <int>               : taxonomy identifier of source [mandatory]
+        
+        -t, --to-tax-ids <list>               : comma separated taxonomy identifiers of targets [mandatory]
+        
+        -o, --output-folder <path>            : path to an output folder [mandatory]
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
+        Exit code 2: The number of the input files and the number of the to taxonomy IDs must be equal!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
