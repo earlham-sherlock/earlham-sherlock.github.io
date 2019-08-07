@@ -48,6 +48,30 @@ def parse_args(args):
     help_text = \
         """
         === GO Annotations Loader script ===
+        
+        **Description:**
+
+        This script takes a GAF GO Annotation file, which contains annotations
+        and converts it to Sherlock compatible JSON format.
+        
+        We keep only the following information from the GAF file:
+        - column1: DB
+        - column2: DB Object ID
+        - column5: GO ID
+        - column7: Evidence Code
+                
+        
+        **Parameters:**
+        
+        -i, --input-file <path>         : path to an existing .gaf file [mandatory]
+        
+        -t, --tax-id <int>              : taxonomy identifier [mandatory]
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
+        Exit code 2: The specified input file is not a GAF file!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -92,7 +116,7 @@ def write_to_output(line, out):
         json_dictionary["id"] = line[1]
 
     json_dictionary["id_type"] = source_dbs[line[0]]
-    json_dictionary["go_id"] = line[4].split(":")[1]
+    json_dictionary["go_id"] = int(line[4].split(":")[1])
     json_dictionary["evidence"] = evidence_guide[line[6]]
 
     out.write(json.dumps(json_dictionary) + '\n')
@@ -116,17 +140,30 @@ def main():
 
     with open(input_file, 'r') as f, open(output_file, 'w') as out:
 
+        num_lines = sum(1 for line in open(input_file))
+        checking_array = {}
+        iteration = 0
+
         print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing interactions to output file: {abspath_output_file}')
         for line in f:
+
+            percent = int((iteration / num_lines) * 100)
+            sys.stdout.write(f'\rMESSAGE: {iteration} / {num_lines} lines are processed | {percent}% done!')
+            iteration += 1
 
             if line.startswith("!"):
                 continue
 
             else:
                 line = line.strip().split('\t')
+                checking_columns = ",".join([line[0], line[1], line[4], line[6]])
+                if checking_columns in checking_array:
+                    continue
+                checking_array[checking_columns] = True
                 write_to_output(line, out)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: GO Annotations Loader script finished successfully!')
+    sys.stdout.write(f'\rMESSAGE {num_lines} / {num_lines} lines are processed| 100% done!')
+    print(f'\nMESSSAGE [{strftime("%H:%M:%S")}]: GO Annotations Loader script finished successfully!')
 
 
 if __name__ == '__main__':

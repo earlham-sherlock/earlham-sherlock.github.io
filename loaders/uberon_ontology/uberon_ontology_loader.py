@@ -10,9 +10,11 @@ from time import strftime
 def parse_args(args):
     help_text = \
         """
-        === Gene Ontology Loader script ===**Description:**
+        === Uberon Ontology Loader script ===
+        
+        **Description:**
 
-        This script takes an OBO Gene Ontology (GO) file, which contains gene ontologies
+        This script takes an OBO Uberon Ontology (GO) file, which contains ontologies
         and converts it to Sherlock compatible JSON format.
         
         The working directory can be a non-existent folder as well!
@@ -22,18 +24,13 @@ def parse_args(args):
         
         -i, --input-file <path>         : path to an existing .obo file [mandatory]
         
-        -wd, --working-directory        : path to a folder, where the script can work in [mandatory]
+        -wd, --working-directory <path> : path to a folder, where the script can work in [mandatory]
         
         
         **Exit codes**
         
         Exit code 1: The specified input file does not exists!
         Exit code 2: The specified input file is not an OBO file!
-        
-        
-        **Useful links**
-        
-        Information about the relationship between ontology terms: http://geneontology.org/docs/ontology-relations/
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -46,7 +43,7 @@ def parse_args(args):
                         required=True)
 
     parser.add_argument("-wd", "--working-directory",
-                        help="<path to a folder, where the script can work in> [mandatory]",
+                        help="<path to an existing folder, where the script can work in> [mandatory]",
                         type=str,
                         dest="working_directory",
                         action="store",
@@ -68,10 +65,10 @@ def check_params(input_file):
         sys.exit(2)
 
 
-def get_terms_per_line(input_file, helper_file, go_ids):
+def get_terms_per_line(input_file, helper_file, ids):
 
     array = []
-    id_pattern = '(id: GO:([0-9]{7}))'
+    id_pattern = '(id: ([A-Za-z]{2,9}):([0-9]{7}))'
 
     with open(input_file, 'r') as f, open(helper_file, 'w') as out:
 
@@ -81,7 +78,7 @@ def get_terms_per_line(input_file, helper_file, go_ids):
             line = line.strip()
 
             key_words = ['format-version', 'data-version', 'subsetdef', 'synonymtypedef', 'default-namespace',
-                        'remark', 'ontology', 'property_value']
+                         'treat-xrefs-as', 'remark', 'ontology', 'property_value', 'owl-axioms']
 
             if any(ext in line for ext in key_words):
                 continue
@@ -96,35 +93,38 @@ def get_terms_per_line(input_file, helper_file, go_ids):
             elif line == "":
                 array.append(term_array)
 
-            if "id: GO:" in line and "alt_id: GO:" not in line:
+            if "id: " in line and "alt_id: " not in line:
                 id = re.findall(id_pattern, line)
                 if id:
-                    if id not in go_ids:
-                        go_ids.append(id[0][1])
+                    if id not in ids:
+                        ids.append(id[0][0].split(" ")[1])
 
         for member in array:
 
             if member != []:
-                if "id: GO:" not in member[0]:
+
+                if "RO:" in member[0] or "BFO:0000066" in member[0]:
                     continue
-                else:
+
+                id_in_member = re.findall(id_pattern, member[0])
+                if id_in_member:
                     out.write("|".join(member) + '\n')
 
 
-def get_direct_parents(go_ids, helper_file):
+def get_direct_parents(ids, helper_file):
 
     parents_dictionary = {}
-    pattern = '(is_a: GO:([0-9]{7}))'
-    pattern2 = '(part_of GO:([0-9]{7}))'
+    pattern = '(is_a: ([A-Za-z]{2,9}):([0-9]{7}))'
+    pattern2 = '(part_of ([A-Za-z]{2,9}):([0-9]{7}))'
 
     with open(helper_file, 'r') as f2:
 
         for row in f2:
             row = row.strip()
 
-            identifier = row.split("|")[0].split(":")[2]
+            identifier = row.split("|")[0].split(" ")[1]
 
-            if identifier in go_ids:
+            if identifier in ids:
                 if "is_a" in row or "part_of" in row:
                     parents = re.findall(pattern, row)
                     parents2 = re.findall(pattern2, row)
@@ -135,7 +135,7 @@ def get_direct_parents(go_ids, helper_file):
 
                         if len(parents) > 0:
                             if parents[i][1] not in parents_dictionary[identifier]:
-                                parents_dictionary[identifier].append(parents[i][1])
+                                parents_dictionary[identifier].append(parents[i][0].split(" ")[1])
 
                     for i in range(0, len(parents2)):
                         if identifier not in parents_dictionary:
@@ -143,7 +143,7 @@ def get_direct_parents(go_ids, helper_file):
 
                         if len(parents2) > 0:
                             if parents2[i][1] not in parents_dictionary[identifier]:
-                                parents_dictionary[identifier].append(parents2[i][1])
+                                parents_dictionary[identifier].append(parents2[i][0].split(" ")[1])
 
     return parents_dictionary
 
@@ -165,11 +165,11 @@ def get_direct_children(parents_dictionary):
     return children_dictionary
 
 
-def get_all_relations(go_ids, given_dictionary):
+def get_all_relations(ids, given_dictionary):
 
     return_relations = defaultdict(list)
 
-    for term in go_ids:
+    for term in ids:
 
         all_relations = []
         if term in given_dictionary:
@@ -198,7 +198,7 @@ def get_relatives_ids(id, dictionary):
     if id in dictionary:
         for value in dictionary[id]:
             if value not in array:
-                array.append(int(value))
+                array.append(value.lower())
 
     return array
 
@@ -211,15 +211,17 @@ def write_to_output(helper_file, parents_dictionary, children_dictionary, all_pa
         for line in f:
             line = line.strip().split('|')
 
-            id = line[0].split(":")[2]
-            name = line[1].split(" ")[1]
-            namespace = line[2].split(" ")[1]
+            id = line[0].split(" ")[1]
+            name = line[1].split(":")[1].replace(" ", "")
 
             json_dictionary = {}
-            json_dictionary["id"] = int(id)
-            json_dictionary["id_type"] = "GO"
-            json_dictionary["name"] = name
-            json_dictionary["namespace"] = namespace
+            json_dictionary["id"] = id.lower()
+
+            if "name" in line[1]:
+                json_dictionary["name"] = name
+            else:
+                json_dictionary["name"] = None
+
             json_dictionary["alt_ids"] = []
             json_dictionary["direct_parents"] = []
             json_dictionary["direct_children"] = []
@@ -227,20 +229,20 @@ def write_to_output(helper_file, parents_dictionary, children_dictionary, all_pa
             json_dictionary["all_children"] = []
 
             for columns in line:
-                alt_id_pattern = '(alt_id: GO:([0-9]{7}))'
+                alt_id_pattern = '(alt_id: ([A-Za-z]{2,9}):([0-9]{7}))'
 
                 alt_ids = re.findall(alt_id_pattern, columns)
 
                 if alt_ids:
-                    json_dictionary["alt_ids"].append(int(alt_ids[0][1]))
+                    json_dictionary["alt_ids"].append(alt_ids[0][0].split(" ")[1].lower())
 
             if id in parents_dictionary:
                 for member_in_parents_dictionary in parents_dictionary[id]:
-                    json_dictionary["direct_parents"].append(int(member_in_parents_dictionary))
+                    json_dictionary["direct_parents"].append(member_in_parents_dictionary.lower())
 
             if id in children_dictionary:
                 for member_in_children_dictionary in children_dictionary[id]:
-                    json_dictionary["direct_children"].append(int(member_in_children_dictionary))
+                    json_dictionary["direct_children"].append(member_in_children_dictionary.lower())
 
             all_parents_array = get_relatives_ids(id, all_parents_dictionary)
             if len(all_parents_array) > 0:
@@ -263,31 +265,31 @@ def main():
     check_params(input_file)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
-    go_ids = []
+    ids = []
     helper_file = os.path.join(working_directory, "helper.txt")
     abspath_helper_file = os.path.abspath(helper_file)
     output_file = os.path.join(working_directory, "go.json")
     abspath_output_file = os.path.abspath(output_file)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an helper file: {abspath_helper_file}')
-    get_terms_per_line(input_file, helper_file, go_ids)
+    get_terms_per_line(input_file, helper_file, ids)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
-    parents_dictionary = get_direct_parents(go_ids, helper_file)
+    parents_dictionary = get_direct_parents(ids, helper_file)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed children of each term')
     children_dictionary = get_direct_children(parents_dictionary)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all parents of each term')
-    all_parents_dictionary = get_all_relations(go_ids, parents_dictionary)
+    all_parents_dictionary = get_all_relations(ids, parents_dictionary)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all children of each term')
-    all_children_dictionary = get_all_relations(go_ids, children_dictionary)
+    all_children_dictionary = get_all_relations(ids, children_dictionary)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing results to output file: {abspath_output_file}')
     write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the helper file')
-    os.remove(helper_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Gene Ontology Loader script finished successfully!')
+    # os.remove(helper_file)
+    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Uberon Ontology Loader script finished successfully!')
 
 
 if __name__ == '__main__':
