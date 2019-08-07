@@ -2,7 +2,7 @@
 
 echo "Downloading from S3... s3://${S3_BUCKET}/${BACKUP_PATH}"
 
-if [[ "$S3_SSL_VALIDATION_DISABLE" != "true" ]]; then
+if [[ "$S3_SSL_VALIDATION_DISABLE" == "true" ]]; then
     export S3CMD_ARGS=" --no-check-certificate"
 else
     export S3CMD_ARGS=""

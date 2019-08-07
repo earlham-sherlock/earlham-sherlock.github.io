@@ -2,7 +2,7 @@
 
 set -e
 
-if [[ "$S3_SSL_VALIDATION_DISABLE" != "true" ]]; then
+if [[ "$S3_SSL_VALIDATION_DISABLE" == "true" ]]; then
     export S3CMD_ARGS=" --no-check-certificate"
 else
     export S3CMD_ARGS=""
