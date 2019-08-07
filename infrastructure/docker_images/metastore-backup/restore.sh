@@ -2,7 +2,13 @@
 
 echo "Downloading from S3... s3://${S3_BUCKET}/${BACKUP_PATH}"
 
-s3cmd get s3://${S3_BUCKET}/${BACKUP_PATH} /dump.sql.gz
+if [[ "$S3_SSL_VALIDATION_DISABLE" != "true" ]]; then
+    export S3CMD_ARGS=" --no-check-certificate"
+else
+    export S3CMD_ARGS=""
+fi
+
+s3cmd get s3://${S3_BUCKET}/${BACKUP_PATH} /dump.sql.gz ${S3CMD_ARGS}
 gunzip /dump.sql.gz
 
 

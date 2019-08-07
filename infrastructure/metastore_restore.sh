@@ -40,5 +40,6 @@ docker run \
   --env S3_SECRET_KEY="${SHERLOCK_S3_SECRET_KEY}" \
   --env S3_BUCKET="${SHERLOCK_BUCKET_NAME}" \
   --env S3_SSL_ENABLED="${SHERLOCK_S3_SSL_ENABLED}" \
+  --env S3_SSL_VALIDATION_DISABLE="${SHERLOCK_S3_SSL_VALIDATION_DISABLE}" \
   --env BACKUP_PATH="${1}" \
   sherlockdatalake/metastore-backup:9_6 /restore.sh

@@ -14,25 +14,25 @@ def parse_args(args):
 
         This script takes an OBO Gene Ontology (GO) file, which contains gene ontologies
         and converts it to Sherlock compatible JSON format.
-        
+
         The working directory can be a non-existent folder as well!
-        
-        
+
+
         **Parameters:**
-        
+
         -i, --input-file <path>         : path to an existing .obo file [mandatory]
-        
+
         -wd, --working-directory        : path to a folder, where the script can work in [mandatory]
-        
-        
+
+
         **Exit codes**
-        
+
         Exit code 1: The specified input file does not exists!
         Exit code 2: The specified input file is not an OBO file!
-        
-        
+
+
         **Useful links**
-        
+
         Information about the relationship between ontology terms: http://geneontology.org/docs/ontology-relations/
         """
 
@@ -60,11 +60,13 @@ def parse_args(args):
 def check_params(input_file):
 
     if not os.path.isfile(input_file):
-        sys.stderr.write(f"ERROR MESSAGE: The specified input file does not exists: {input_file}")
+        sys.stderr.write(
+            f"ERROR MESSAGE: The specified input file does not exists: {input_file}")
         sys.exit(1)
 
     if not input_file.endswith(".obo"):
-        sys.stderr.write(f"ERROR MESSAGE: The specified input file is not an OBO file: {input_file}")
+        sys.stderr.write(
+            f"ERROR MESSAGE: The specified input file is not an OBO file: {input_file}")
         sys.exit(2)
 
 
@@ -81,7 +83,7 @@ def get_terms_per_line(input_file, helper_file, go_ids):
             line = line.strip()
 
             key_words = ['format-version', 'data-version', 'subsetdef', 'synonymtypedef', 'default-namespace',
-                        'remark', 'ontology', 'property_value']
+                         'remark', 'ontology', 'property_value']
 
             if any(ext in line for ext in key_words):
                 continue
@@ -135,7 +137,8 @@ def get_direct_parents(go_ids, helper_file):
 
                         if len(parents) > 0:
                             if parents[i][1] not in parents_dictionary[identifier]:
-                                parents_dictionary[identifier].append(parents[i][1])
+                                parents_dictionary[identifier].append(
+                                    parents[i][1])
 
                     for i in range(0, len(parents2)):
                         if identifier not in parents_dictionary:
@@ -143,7 +146,8 @@ def get_direct_parents(go_ids, helper_file):
 
                         if len(parents2) > 0:
                             if parents2[i][1] not in parents_dictionary[identifier]:
-                                parents_dictionary[identifier].append(parents2[i][1])
+                                parents_dictionary[identifier].append(
+                                    parents2[i][1])
 
     return parents_dictionary
 
@@ -182,7 +186,8 @@ def get_all_relations(go_ids, given_dictionary):
             all_relations_to_check_add = []
             for relations_to_check in all_relations_to_check:
                 if relations_to_check in given_dictionary:
-                    all_relations_to_check_add.extend(given_dictionary[relations_to_check])
+                    all_relations_to_check_add.extend(
+                        given_dictionary[relations_to_check])
             all_relations_to_check = []
             all_relations_to_check = list(set(all_relations_to_check_add))
             all_relations.extend(all_relations_to_check)
@@ -236,11 +241,13 @@ def write_to_output(helper_file, parents_dictionary, children_dictionary, all_pa
 
             if id in parents_dictionary:
                 for member_in_parents_dictionary in parents_dictionary[id]:
-                    json_dictionary["direct_parents"].append(int(member_in_parents_dictionary))
+                    json_dictionary["direct_parents"].append(
+                        int(member_in_parents_dictionary))
 
             if id in children_dictionary:
                 for member_in_children_dictionary in children_dictionary[id]:
-                    json_dictionary["direct_children"].append(int(member_in_children_dictionary))
+                    json_dictionary["direct_children"].append(
+                        int(member_in_children_dictionary))
 
             all_parents_array = get_relatives_ids(id, all_parents_dictionary)
             if len(all_parents_array) > 0:
@@ -261,7 +268,8 @@ def main():
         os.mkdir(working_directory)
 
     check_params(input_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
     go_ids = []
     helper_file = os.path.join(working_directory, "helper.txt")
@@ -269,25 +277,30 @@ def main():
     output_file = os.path.join(working_directory, "go.json")
     abspath_output_file = os.path.abspath(output_file)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an helper file: {abspath_helper_file}')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Creating an helper file: {abspath_helper_file}')
     get_terms_per_line(input_file, helper_file, go_ids)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed parents of each term')
     parents_dictionary = get_direct_parents(go_ids, helper_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed children of each term')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all the directed children of each term')
     children_dictionary = get_direct_children(parents_dictionary)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all parents of each term')
     all_parents_dictionary = get_all_relations(go_ids, parents_dictionary)
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Get all children of each term')
     all_children_dictionary = get_all_relations(go_ids, children_dictionary)
 
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing results to output file: {abspath_output_file}')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Writing results to output file: {abspath_output_file}')
     write_to_output(helper_file, parents_dictionary, children_dictionary, all_parents_dictionary,
                     all_children_dictionary, output_file)
 
     print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Deleting the helper file')
     os.remove(helper_file)
-    print(f'MESSSAGE [{strftime("%H:%M:%S")}]: Gene Ontology Loader script finished successfully!')
+    print(
+        f'MESSSAGE [{strftime("%H:%M:%S")}]: Gene Ontology Loader script finished successfully!')
 
 
 if __name__ == '__main__':

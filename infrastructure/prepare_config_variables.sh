@@ -52,6 +52,15 @@ else
     export SHERLOCK_S3_SSL_ENABLED=true
 fi
 
+if [ -z ${SHERLOCK_S3_SSL_VALIDATION_DISABLE+x} ]; then
+    export SHERLOCK_S3_SSL_VALIDATION_DISABLE=false
+fi
+if [[ "$SHERLOCK_S3_SSL_VALIDATION_DISABLE" != "true" ]]; then
+    export SHERLOCK_S3_SSL_VALIDATION_DISABLE=false
+else
+    export SHERLOCK_S3_SSL_VALIDATION_DISABLE=true
+fi
+
 export SHERLOCK_S3_PATH_STYLE_ACCESS=true
 
 # ======= calculate presto memory settings =======
