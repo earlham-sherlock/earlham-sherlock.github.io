@@ -34,9 +34,16 @@ def parse_args(args):
                         action="store",
                         required=True)
 
+    parser.add_argument("-l", "--location",
+                        help="<directory name of the files in the landing zone> [mandatory]",
+                        type=str,
+                        dest="location",
+                        action="store",
+                        required=True)
+
     results = parser.parse_args(args)
 
-    return results.input_file, results.header, results.output_file
+    return results.input_file, results.header, results.output_file, results.location
 
 
 def check_params(input_file):
@@ -67,8 +74,10 @@ def collect_needed_information(needed_columns, json_column_names, list_or_not, d
 
     column_type = str(input("Type of the given column? (str for string, int for integer or float): "))
     accepted_types = ["str", "int", "float"]
+
     if column_type in accepted_types:
         types.append(column_type)
+
     else:
         sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: Type what you gave is not correct: {column_type}')
         sys.exit(2)
@@ -100,9 +109,58 @@ def write_to_output(line, out, needed_columns, json_column_names, list_or_not, d
     out.write(json.dumps(json_dictionary) + '\n')
 
 
+def landing_zone_table_definition(location, json_column_names, list_or_not, types):
+
+    project_directory = f'../../projects/{location}'
+    if not os.path.isdir(project_directory):
+        os.mkdir(project_directory)
+
+    landing_zone_file = f'{project_directory}/{location}_landing.sql'
+
+    with open(landing_zone_file, 'w') as landing:
+
+        landing.write(f'CREATE TABLE IF NOT EXISTS landing.{location} (' + '\n')
+
+        for l in range(0, len(json_column_names)):
+            if list_or_not[l] == "yes":
+                if types[l] == "str":
+                    landing.write(f'{json_column_names[l]} ARRAY<VARCHAR>,' + '\n')
+                elif types[l] == "int":
+                    landing.write(f'{json_column_names[l]} ARRAY<INT>,' + '\n')
+                else:
+                    landing.write(f'{json_column_names[l]} ARRAY<DOUBLE>,' + '\n')
+            else:
+                if types[l] == "str":
+                    landing.write(f'{json_column_names[l]} VARCHAR,' + '\n')
+                elif types[l] == "int":
+                    landing.write(f'{json_column_names[l]} INT,' + '\n')
+                else:
+                    landing.write(f'{json_column_names[l]} DOUBLE,' + '\n')
+
+        landing.write(
+            f") WITH (" + '\n' +
+            f"format='JSON'," + '\n' +
+            f"external_location='s3a://sherlock/landing_zone/{location}');")
+
+
+def project_zone_table_definition(location):
+
+    project_directory = f'../../projects/{location}'
+    project_zone_file = f'{project_directory}/{location}_master.sql'
+
+    order_by = str(input("What do you want to order by? (comma separated list): "))
+    order_by_list = order_by.split(",")
+
+    with open(project_zone_file, 'w') as project:
+
+        project.write(f'CREATE TABLE IF NOT EXISTS master.{location} WITH (' + '\n'
+                    f"format = 'ORC'" + '\n'
+                    f") AS SELECT * FROM landing.{location} ORDER BY {', '.join(order_by_list)};")
+
+
 def main():
 
-    input_file, header, output_file = parse_args(sys.argv[1:])
+    input_file, header, output_file, location = parse_args(sys.argv[1:])
 
     check_params(input_file)
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
@@ -138,6 +196,14 @@ def main():
         for line in i:
             line = line.strip().split("\t")
             write_to_output(line, out, needed_columns, json_column_names, list_or_not, delimiter, types)
+
+    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the landing zone table definition and save it to a file')
+    landing_zone_table_definition(location, json_column_names, list_or_not, types)
+    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Landing zone table definition is done!')
+
+    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the project zone table definition and save it to a file')
+    project_zone_table_definition(location)
+    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Project zone table definition is done!')
 
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Sherlock Table Loader script finished successfully!')
 
