@@ -1,6 +1,7 @@
 import argparse
 import sys
 import os
+import re
 import json
 from time import strftime
 
@@ -20,30 +21,16 @@ def parse_args(args):
                         action="store",
                         required=True)
 
-    parser.add_argument("-hea", "--header",
-                        help="<a number that shows how many header lines the input file has> [mandatory]",
-                        type=int,
-                        dest="header",
-                        action="store",
-                        required=True)
-
     parser.add_argument("-o", "--output-file",
-                        help="<path to an output file> [mandatory]",
+                        help="<path to an output json file> [mandatory]",
                         type=str,
                         dest="output_file",
                         action="store",
                         required=True)
 
-    parser.add_argument("-l", "--location",
-                        help="<directory name of the files in the landing zone> [mandatory]",
-                        type=str,
-                        dest="location",
-                        action="store",
-                        required=True)
-
     results = parser.parse_args(args)
 
-    return results.input_file, results.header, results.output_file, results.location
+    return results.input_file, results.output_file
 
 
 def check_params(input_file):
@@ -53,58 +40,37 @@ def check_params(input_file):
         sys.exit(1)
 
 
-def collect_needed_information(needed_columns, json_column_names, list_or_not, delimiter, types):
-
-    column_number = int(input("Number of the column? (Note: numbering of the columns starts with 0!): "))
-    needed_columns.append(column_number)
-
-    column_name = str(input("Name of the given column in the output json file?: "))
-    json_column_names.append(column_name)
-
-    column_list = str(input("Is this given column a list or not? (yes or no): "))
-
-    if column_list == "Yes" or column_list == "yes" or column_list == "y":
-        list_or_not.append("yes")
-        list_delimiter = str(input("What is the delimiter in this list?: "))
-        delimiter.append(list_delimiter)
-
-    else:
-        list_or_not.append("no")
-        delimiter.append(None)
-
-    column_type = str(input("Type of the given column? (str for string, int for integer or float): "))
-    accepted_types = ["str", "int", "float"]
-
-    if column_type in accepted_types:
-        types.append(column_type)
-
-    else:
-        sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: Type what you gave is not correct: {column_type}')
-        sys.exit(2)
-
-
-def write_to_output(line, out, needed_columns, json_column_names, list_or_not, delimiter, types):
+def write_to_output(line, column_names, column_types, out):
 
     json_dictionary = {}
 
-    for m in range(0, len(needed_columns)):
-        if list_or_not[m] == "yes":
-            json_list = line[needed_columns[m]].split(delimiter[m])
-            json_dictionary[json_column_names[m]] = []
-            for member in json_list:
-                if types[m] == "int":
-                    json_dictionary[json_column_names[m]].append(int(member))
-                elif types[m] == "float":
-                    json_dictionary[json_column_names[m]].append(float(member))
-                else:
-                    json_dictionary[json_column_names[m]].append(member)
+    for x in range(0, len(column_names)):
+
+        if '[]' in column_types[x]:
+
+            json_dictionary[column_names[x]] = []
+            list_values = line[x].split(",")
+            for value in list_values:
+
+                if 'str' in column_types[x]:
+                    json_dictionary[column_names[x]].append(str(value))
+
+                elif 'int' in column_types[x]:
+                    json_dictionary[column_names[x]].append(int(value))
+
+                elif 'float' in column_types[x]:
+                    json_dictionary[column_names[x]].append(float(value))
+
         else:
-            if types[m] == "int":
-                json_dictionary[json_column_names[m]] = int(line[needed_columns[m]])
-            elif types[m] == "float":
-                json_dictionary[json_column_names[m]] = float(line[needed_columns[m]])
-            else:
-                json_dictionary[json_column_names[m]] = line[needed_columns[m]]
+
+            if 'str' in column_types[x]:
+                json_dictionary[column_names[x]] = str(line[x])
+
+            elif 'int' in column_types[x]:
+                json_dictionary[column_names[x]] = int(line[x])
+
+            elif 'float' in column_types[x]:
+                json_dictionary[column_names[x]] = float(line[x])
 
     out.write(json.dumps(json_dictionary) + '\n')
 
@@ -160,50 +126,44 @@ def project_zone_table_definition(location):
 
 def main():
 
-    input_file, header, output_file, location = parse_args(sys.argv[1:])
+    input_file, output_file = parse_args(sys.argv[1:])
 
     check_params(input_file)
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
-    needed_columns = []
-    json_column_names = []
-    list_or_not = []
-    delimiter = []
-    types = []
-
-    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Collecting needed information form the input file {input_file}\n')
-
-    collect_needed_information(needed_columns, json_column_names, list_or_not, delimiter, types)
-
-    for x in range(0, 10000):
-
-        question = str(input("\nDo you want to select an other column and add it to the output json file? (yes or no): "))
-        if question == "No" or question == "no" or question == "n":
-            break
-
-        collect_needed_information(needed_columns, json_column_names, list_or_not, delimiter, types)
-
-    print(f'Your selected columns from the input file: {needed_columns}\nYour selected names of the columns: {json_column_names}')
-
-    abs_output_filepath = os.path.abspath(output_file)
-    print(f'\nMESSAGE [{strftime("%H:%M:%S")}]: Writing results to the output json file {abs_output_filepath}')
     with open(input_file, 'r') as i, open(output_file, 'w') as out:
 
-        if header != 0:
-            for n in range(0, header):
-                i.readline()
+        index = 1
+        column_names = []
+        column_types = []
 
         for line in i:
-            line = line.strip().split("\t")
-            write_to_output(line, out, needed_columns, json_column_names, list_or_not, delimiter, types)
+            line = line.strip().split('\t')
 
-    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the landing zone table definition and save it to a file')
-    landing_zone_table_definition(location, json_column_names, list_or_not, types)
-    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Landing zone table definition is done!')
+            if len(line) == 0:
+                sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
+                                 f'The input file has not comma separated values in the {index}. line!')
+                sys.exit(2)
 
-    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the project zone table definition and save it to a file')
-    project_zone_table_definition(location)
-    print(f'MESSAGE [{strftime("%H:%M:%S")}]: Project zone table definition is done!')
+            if index == 1:
+
+                for name in line:
+                    regex = re.compile('[@!#$%^&*()<>?/\}|{~:]')
+                    if regex.search(name) is not None:
+                        sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
+                                         f'The column name has a special character: {name}')
+                        sys.exit(3)
+                    column_names.append(name)
+
+            elif index == 2:
+
+                for types in line:
+                    column_types.append(types)
+
+            else:
+                write_to_output(line, column_names, column_types, out)
+
+            index += 1
 
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Sherlock Table Loader script finished successfully!')
 
