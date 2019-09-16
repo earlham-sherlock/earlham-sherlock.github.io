@@ -21,6 +21,13 @@ def parse_args(args):
                         action="store",
                         required=True)
 
+    parser.add_argument("-t", "--table-name",
+                        help="<name of the table what you want to upload to sherlock> [mandatory]",
+                        type=str,
+                        dest="table_name",
+                        action="store",
+                        required=True)
+
     parser.add_argument("-o", "--output-file",
                         help="<path to an output json file> [mandatory]",
                         type=str,
@@ -30,7 +37,7 @@ def parse_args(args):
 
     results = parser.parse_args(args)
 
-    return results.input_file, results.output_file
+    return results.input_file, results.table_name, results.output_file
 
 
 def check_params(input_file):
@@ -42,128 +49,114 @@ def check_params(input_file):
 
 def write_to_output(line, column_names, column_types, out):
 
+    type_proc_json = {
+        "varchar": lambda x: str(x),
+        "[]varchar": lambda x: [str(i) for i in x.split(",")],
+        "int": lambda x: int(x),
+        "[]int": lambda x: [int(i) for i in x.split(",")],
+        "double": lambda x: float(x),
+        "[]double": lambda x: [float(i) for i in x.split(",")],
+    }
+
     json_dictionary = {}
 
-    for x in range(0, len(column_names)):
+    for n in range(0, len(column_names)):
 
-        if '[]' in column_types[x]:
+        try:
+            checked_val = type_proc_json[column_types[n]](line[n])
+            json_dictionary[column_names[n]] = checked_val
 
-            json_dictionary[column_names[x]] = []
-            list_values = line[x].split(",")
-            for value in list_values:
+        except KeyError:
+            pass
 
-                if 'str' in column_types[x]:
-                    json_dictionary[column_names[x]].append(str(value))
-
-                elif 'int' in column_types[x]:
-                    json_dictionary[column_names[x]].append(int(value))
-
-                elif 'float' in column_types[x]:
-                    json_dictionary[column_names[x]].append(float(value))
-
-        else:
-
-            if 'str' in column_types[x]:
-                json_dictionary[column_names[x]] = str(line[x])
-
-            elif 'int' in column_types[x]:
-                json_dictionary[column_names[x]] = int(line[x])
-
-            elif 'float' in column_types[x]:
-                json_dictionary[column_names[x]] = float(line[x])
+        except ValueError:
+            pass
 
     out.write(json.dumps(json_dictionary) + '\n')
 
 
-def landing_zone_table_definition(location, json_column_names, list_or_not, types):
+def landing_zone_table_definition(column_names_list, column_types_list, table_name):
 
-    project_directory = f'../../projects/{location}'
-    if not os.path.isdir(project_directory):
-        os.mkdir(project_directory)
+    type_proc_sql = {
+        "varchar": "VARCHAR",
+        "[]varchar": "ARRAY<VARCHAR>",
+        "int": "INT",
+        "[]int": "ARRAY<INT>",
+        "double": "DOUBLE",
+        "[]double": "ARRAY<DOUBLE>",
+    }
 
-    landing_zone_file = f'{project_directory}/{location}_landing.sql'
+    sql_types = []
 
-    with open(landing_zone_file, 'w') as landing:
+    for m in range(0, len(column_names_list)):
 
-        landing.write(f'CREATE TABLE IF NOT EXISTS landing.{location} (' + '\n')
+        sql_types.append(column_names_list[m] + " " + type_proc_sql[column_types_list[m]])
 
-        for l in range(0, len(json_column_names)):
-            if list_or_not[l] == "yes":
-                if types[l] == "str":
-                    landing.write(f'{json_column_names[l]} ARRAY<VARCHAR>,' + '\n')
-                elif types[l] == "int":
-                    landing.write(f'{json_column_names[l]} ARRAY<INT>,' + '\n')
-                else:
-                    landing.write(f'{json_column_names[l]} ARRAY<DOUBLE>,' + '\n')
-            else:
-                if types[l] == "str":
-                    landing.write(f'{json_column_names[l]} VARCHAR,' + '\n')
-                elif types[l] == "int":
-                    landing.write(f'{json_column_names[l]} INT,' + '\n')
-                else:
-                    landing.write(f'{json_column_names[l]} DOUBLE,' + '\n')
+    values_for_sql_query = ", ".join(sql_types)
+    landing_zone_sql_query = f"CREATE TABLE IF NOT EXISTS landing.test ({values_for_sql_query}) WITH " \
+        f"(format = 'JSON', external_location = 's3a://sherlock/landing_zone/{table_name}');"
 
-        landing.write(
-            f") WITH (" + '\n' +
-            f"format='JSON'," + '\n' +
-            f"external_location='s3a://sherlock/landing_zone/{location}');")
+    return landing_zone_sql_query
 
 
-def project_zone_table_definition(location):
+def project_zone_table_definition(table_name):
 
-    project_directory = f'../../projects/{location}'
-    project_zone_file = f'{project_directory}/{location}_master.sql'
+    project_zone_sql_query = f"CREATE TABLE IF NOT EXISTS project.{table_name} WITH " \
+        f"(format = 'ORC') AS SELECT * FROM landing.{table_name};"
 
-    order_by = str(input("What do you want to order by? (comma separated list): "))
-    order_by_list = order_by.split(",")
-
-    with open(project_zone_file, 'w') as project:
-
-        project.write(f'CREATE TABLE IF NOT EXISTS master.{location} WITH (' + '\n'
-                    f"format = 'ORC'" + '\n'
-                    f") AS SELECT * FROM landing.{location} ORDER BY {', '.join(order_by_list)};")
+    return project_zone_sql_query
 
 
 def main():
 
-    input_file, output_file = parse_args(sys.argv[1:])
+    input_file, table_name, output_file = parse_args(sys.argv[1:])
 
     check_params(input_file)
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Parameters are fine, starting...')
 
     with open(input_file, 'r') as i, open(output_file, 'w') as out:
 
-        index = 1
-        column_names = []
-        column_types = []
+        column_names_list = []
+        column_types_list = []
 
-        for line in i:
-            line = line.strip().split('\t')
+        column_names = i.readline()
+        column_names = column_names.strip().split('\t')
 
-            if len(line) == 0:
+        print(f'MESSAGE [{strftime("%H:%M:%S")}]: Collect the names of the columns')
+        for name in column_names:
+            regex = re.compile('[@!#$%^&*()<>?/\}|{~:]')
+
+            if regex.search(name) is not None:
                 sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
-                                 f'The input file has not comma separated values in the {index}. line!')
-                sys.exit(2)
+                                 f'The column name has a special character: {name}')
+                sys.exit(3)
+            column_names_list.append(name)
 
-            if index == 1:
+        column_types = i.readline()
+        column_types = column_types.strip().split('\t')
 
-                for name in line:
-                    regex = re.compile('[@!#$%^&*()<>?/\}|{~:]')
-                    if regex.search(name) is not None:
-                        sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
-                                         f'The column name has a special character: {name}')
-                        sys.exit(3)
-                    column_names.append(name)
+        print(f'MESSAGE [{strftime("%H:%M:%S")}]: Collect the types of the columns')
+        for types in column_types:
+            acceptable_types = ["[]varchar", "varchar", "[]int", "int", "[]double", "double"]
 
-            elif index == 2:
+            if types not in acceptable_types:
+                sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
+                                 f'The column type is incorrect: {types}')
+                sys.exit(4)
+            column_types_list.append(types)
 
-                for types in line:
-                    column_types.append(types)
+        abspath_output_file = os.path.abspath(output_file)
+        print(f'MESSAGE [{strftime("%H:%M:%S")}]: Writing results to the output file: {abspath_output_file}')
+        for line in i:
 
-            else:
-                write_to_output(line, column_names, column_types, out)
+            line = line.strip().split('\t')
+            write_to_output(line, column_names, column_types_list, out)
 
-            index += 1
+        print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the landing zone table definiton')
+        landing_zone_sql_query = landing_zone_table_definition(column_names_list, column_types_list, table_name)
+
+        print(f'MESSAGE [{strftime("%H:%M:%S")}]: Creating the project zone table definiton')
+        project_zone_sql_query = project_zone_table_definition(table_name)
 
     print(f'MESSAGE [{strftime("%H:%M:%S")}]: Sherlock Table Loader script finished successfully!')
 
