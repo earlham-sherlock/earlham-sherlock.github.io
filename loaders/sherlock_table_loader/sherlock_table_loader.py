@@ -10,6 +10,40 @@ def parse_args(args):
     help_text = \
         """
         === Sherlock Table Loader script ===
+        
+        **Description:**
+
+        This script takes a TSV/CSV file, which contains any type of data
+        and converts it to Sherlock compatible JSON format.<br>
+        Then it uploads the json file to the landing zone on S3, registers it
+        into HIVE, uploads to the project zone in ORC format and deletes
+        it from the landing zone.
+        
+        
+        **Parameters:**
+        
+        -i, --input-file-list <path>          : path to an existing TSV/CSV/MITAB file [mandatory]
+        
+        -t, --table-name <str>                : name of the table what you want to upload to sherlock [mandatory]
+        
+        -o, --output-file <path>              : path to an output json file [mandatory]
+        
+        
+        **Requirements for the input file:**
+        
+        1) The input file must be a tab separated file!
+        2) The first line should contain the names of the columns in the table!
+        3) The second line should contain the type of data in the columns of the table! Available types:
+            - for STRING (text): the second line should be 'varchar' (see in the example input file)
+            - for INTEGER (numbers): the second line should be 'int'
+            - for FLOAT (float numbers): the second line should be 'double'
+        
+        
+        **Exit codes**
+        
+        Exit code 1: The specified input file does not exists!
+        Exit code 2: One of the column name has a special character!
+        Exit code 3: One of the column type is incorrect!
         """
 
     parser = argparse.ArgumentParser(description=help_text)
@@ -128,8 +162,8 @@ def main():
 
             if regex.search(name) is not None:
                 sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
-                                 f'The column name has a special character: {name}')
-                sys.exit(3)
+                                 f'One of the column name has a special character: {name}')
+                sys.exit(2)
             column_names_list.append(name)
 
         column_types = i.readline()
@@ -141,8 +175,8 @@ def main():
 
             if types not in acceptable_types:
                 sys.stderr.write(f'ERROR MESSAGE [{strftime("%H:%M:%S")}]: '
-                                 f'The column type is incorrect: {types}')
-                sys.exit(4)
+                                 f'One of the column type is incorrect: {types}')
+                sys.exit(3)
             column_types_list.append(types)
 
         abspath_output_file = os.path.abspath(output_file)
