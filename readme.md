@@ -45,6 +45,9 @@ The people behind the Sherlock project:
 * [Máté Szalay-Bekő](http://www.earlham.ac.uk/mate-szalay-beko)
 * [Dávid Fazekas](http://www.earlham.ac.uk/david-fazekas)
 
+### Developers
+* Balazs Bohar
+* Matthew Madgwick
 
 
 ---
