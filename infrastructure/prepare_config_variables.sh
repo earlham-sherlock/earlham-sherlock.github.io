@@ -62,7 +62,17 @@ else
 fi
 
 if [ -z ${SHERLOCK_S3_PATH_STYLE_ACCESS+x} ]; then
-    export SHERLOCK_S3_PATH_STYLE_ACCESS=true
+    endpoint_no_proto_ps="${SHERLOCK_S3_END_POINT#http://}"
+    endpoint_no_proto_ps="${endpoint_no_proto_ps#https://}"
+    if [[ -n "${SHERLOCK_BUCKET_NAME:-}" && "${endpoint_no_proto_ps}" == "${SHERLOCK_BUCKET_NAME}."* ]]; then
+        endpoint_no_proto_ps="${endpoint_no_proto_ps#"${SHERLOCK_BUCKET_NAME}."}"
+    fi
+
+    if [[ "${endpoint_no_proto_ps}" == *.digitaloceanspaces.com ]]; then
+        export SHERLOCK_S3_PATH_STYLE_ACCESS=false
+    else
+        export SHERLOCK_S3_PATH_STYLE_ACCESS=true
+    fi
 fi
 
 # Default S3 region for tools that require it for v4 signing.

@@ -20,7 +20,15 @@ fi
 # s3cmd needs a proper host_bucket template and region (bucket_location) for v4 signing.
 # - Path-style:  host_bucket = endpoint/%(bucket)
 # - VHost-style: host_bucket = %(bucket).endpoint
-if [[ "${S3_PATH_STYLE_ACCESS:-true}" == "true" ]]; then
+if [[ -z "${S3_PATH_STYLE_ACCESS:-}" ]]; then
+	if [[ "${S3_END_POINT}" == *.digitaloceanspaces.com ]]; then
+		S3_PATH_STYLE_ACCESS=false
+	else
+		S3_PATH_STYLE_ACCESS=true
+	fi
+fi
+
+if [[ "${S3_PATH_STYLE_ACCESS}" == "true" ]]; then
 	export S3_HOST_BUCKET="${S3_END_POINT}/%(bucket)"
 else
 	export S3_HOST_BUCKET="%(bucket).${S3_END_POINT}"
