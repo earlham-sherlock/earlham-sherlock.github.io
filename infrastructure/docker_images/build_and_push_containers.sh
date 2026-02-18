@@ -32,8 +32,8 @@ build_image () {
     echo -e "=======\n"
 
 
-    docker tag ${name}:${version} sherlockdatalake/$name:${version}
-    docker push sherlockdatalake/$name:${version}
+    docker tag ${name}:${version} bbazsi41/$name:${version}
+    docker push bbazsi41/$name:${version}
 
     cd - > /dev/null
 }
