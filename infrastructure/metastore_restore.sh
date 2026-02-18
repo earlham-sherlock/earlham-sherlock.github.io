@@ -2,6 +2,8 @@
 
 set -e
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
 echo -e "\n======="
 echo -e "======= restoring metastore from S3"
 echo -e "=======\n"
@@ -23,13 +25,14 @@ if [[ "$#" -ne 1 ]]; then
     exit 1
 fi
 
-source ./prepare_config_variables.sh
-./init_docker.sh
+source "${SCRIPT_DIR}/prepare_config_variables.sh"
+"${SCRIPT_DIR}/init_docker.sh"
 
 
 docker run \
   --rm  \
   --network sherlock-overlay \
+    --volume "${SCRIPT_DIR}/docker_images/metastore-backup/restore.sh:/restore.sh:ro" \
   --env POSTGRES_HOST="sherlock-postgres" \
   --env POSTGRES_PORT=5432 \
   --env POSTGRES_USER=hive \
