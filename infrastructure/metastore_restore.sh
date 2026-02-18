@@ -32,6 +32,7 @@ source "${SCRIPT_DIR}/prepare_config_variables.sh"
 docker run \
   --rm  \
   --network sherlock-overlay \
+  --entrypoint bash \
   --volume "${SCRIPT_DIR}/docker_images/metastore-backup/entrypoint.sh:/entrypoint.sh:ro" \
   --volume "${SCRIPT_DIR}/docker_images/metastore-backup/s3cfg_template:/s3cfg_template:ro" \
     --volume "${SCRIPT_DIR}/docker_images/metastore-backup/restore.sh:/restore.sh:ro" \
@@ -49,4 +50,4 @@ docker run \
   --env S3_REGION="${SHERLOCK_S3_REGION:-}" \
   --env S3_PATH_STYLE_ACCESS="${SHERLOCK_S3_PATH_STYLE_ACCESS}" \
   --env BACKUP_PATH="${1}" \
-  sherlockdatalake/metastore-backup:9_6 bash /restore.sh
+  sherlockdatalake/metastore-backup:9_6 /entrypoint.sh bash /restore.sh
