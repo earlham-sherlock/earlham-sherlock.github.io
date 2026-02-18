@@ -11,6 +11,27 @@ BACKUP_PATH=${BACKUP_PATH#"/"}
 S3_END_POINT=${S3_END_POINT#"http://"}
 S3_END_POINT=${S3_END_POINT#"https://"}
 
+# s3cmd needs a proper host_bucket template and region (bucket_location) for v4 signing.
+# - Path-style:  host_bucket = endpoint/%(bucket)
+# - VHost-style: host_bucket = %(bucket).endpoint
+if [[ "${S3_PATH_STYLE_ACCESS:-true}" == "true" ]]; then
+	export S3_HOST_BUCKET="${S3_END_POINT}/%(bucket)"
+else
+	export S3_HOST_BUCKET="%(bucket).${S3_END_POINT}"
+fi
+
+# Default region/bucket_location handling (important for DigitalOcean Spaces and AWS).
+if [[ -z "${S3_REGION:-}" ]]; then
+	if [[ "${S3_END_POINT}" == *.digitaloceanspaces.com ]]; then
+		export S3_REGION="${S3_END_POINT%%.*}"
+	elif [[ "${S3_END_POINT}" == s3.*.amazonaws.com ]]; then
+		tmp="${S3_END_POINT#s3.}"
+		export S3_REGION="${tmp%%.amazonaws.com}"
+	else
+		export S3_REGION="us-east-1"
+	fi
+fi
+
 echo "generating ~/.s3cfg"
 envsubst < /s3cfg_template > ~/.s3cfg
 

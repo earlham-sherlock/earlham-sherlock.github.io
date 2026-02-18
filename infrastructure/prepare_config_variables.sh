@@ -61,7 +61,24 @@ else
     export SHERLOCK_S3_SSL_VALIDATION_DISABLE=true
 fi
 
-export SHERLOCK_S3_PATH_STYLE_ACCESS=true
+if [ -z ${SHERLOCK_S3_PATH_STYLE_ACCESS+x} ]; then
+    export SHERLOCK_S3_PATH_STYLE_ACCESS=true
+fi
+
+# Default S3 region for tools that require it for v4 signing.
+if [[ -z "${SHERLOCK_S3_REGION:-}" ]]; then
+    endpoint_no_proto="${SHERLOCK_S3_END_POINT#http://}"
+    endpoint_no_proto="${endpoint_no_proto#https://}"
+
+    if [[ "${endpoint_no_proto}" == *.digitaloceanspaces.com ]]; then
+        export SHERLOCK_S3_REGION="${endpoint_no_proto%%.*}"
+    elif [[ "${endpoint_no_proto}" == s3.*.amazonaws.com ]]; then
+        tmp="${endpoint_no_proto#s3.}"
+        export SHERLOCK_S3_REGION="${tmp%%.amazonaws.com}"
+    else
+        export SHERLOCK_S3_REGION="us-east-1"
+    fi
+fi
 
 # ======= calculate presto memory settings =======
 
