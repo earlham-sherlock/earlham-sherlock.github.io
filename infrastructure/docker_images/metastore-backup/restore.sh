@@ -15,8 +15,14 @@ fi
 # Fail fast with a helpful message instead of continuing with missing files.
 if ! s3cmd ls "${S3_URI}" "${S3CMD_ARGS[@]}" >/dev/null 2>&1; then
     echo "ERROR: S3 object not found (or not accessible): ${S3_URI}" >&2
-    echo "Tip: verify the bucket/key and your endpoint credentials by running inside the container:" >&2
-    echo "  s3cmd ls s3://${S3_BUCKET}/" >&2
+    PARENT_PREFIX="$(dirname -- "${BACKUP_PATH}")"
+    if [[ -n "${PARENT_PREFIX}" && "${PARENT_PREFIX}" != "." ]]; then
+        echo "Tip: listing the parent prefix to find the exact key:" >&2
+        s3cmd ls "s3://${S3_BUCKET}/${PARENT_PREFIX}/" "${S3CMD_ARGS[@]}" >&2 || true
+    else
+        echo "Tip: listing bucket root to find the exact key:" >&2
+        s3cmd ls "s3://${S3_BUCKET}/" "${S3CMD_ARGS[@]}" >&2 || true
+    fi
     exit 2
 fi
 
