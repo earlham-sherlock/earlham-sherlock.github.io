@@ -11,6 +11,12 @@ BACKUP_PATH=${BACKUP_PATH#"/"}
 S3_END_POINT=${S3_END_POINT#"http://"}
 S3_END_POINT=${S3_END_POINT#"https://"}
 
+# DigitalOcean Spaces endpoints are typically "<region>.digitaloceanspaces.com".
+# Users sometimes provide "<bucket>.<region>.digitaloceanspaces.com"; normalize that.
+if [[ -n "${S3_BUCKET:-}" && "${S3_END_POINT}" == "${S3_BUCKET}."* ]]; then
+	S3_END_POINT="${S3_END_POINT#"${S3_BUCKET}."}"
+fi
+
 # s3cmd needs a proper host_bucket template and region (bucket_location) for v4 signing.
 # - Path-style:  host_bucket = endpoint/%(bucket)
 # - VHost-style: host_bucket = %(bucket).endpoint
@@ -23,6 +29,7 @@ fi
 # Default region/bucket_location handling (important for DigitalOcean Spaces and AWS).
 if [[ -z "${S3_REGION:-}" ]]; then
 	if [[ "${S3_END_POINT}" == *.digitaloceanspaces.com ]]; then
+		# "ams3.digitaloceanspaces.com" -> "ams3"
 		export S3_REGION="${S3_END_POINT%%.*}"
 	elif [[ "${S3_END_POINT}" == s3.*.amazonaws.com ]]; then
 		tmp="${S3_END_POINT#s3.}"

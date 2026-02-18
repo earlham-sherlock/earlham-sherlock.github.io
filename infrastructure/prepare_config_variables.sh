@@ -70,6 +70,12 @@ if [[ -z "${SHERLOCK_S3_REGION:-}" ]]; then
     endpoint_no_proto="${SHERLOCK_S3_END_POINT#http://}"
     endpoint_no_proto="${endpoint_no_proto#https://}"
 
+    # Normalize DigitalOcean Spaces endpoints: if user provided "<bucket>.<region>.digitaloceanspaces.com",
+    # strip the bucket prefix because tools expect the regional endpoint.
+    if [[ -n "${SHERLOCK_BUCKET_NAME:-}" && "${endpoint_no_proto}" == "${SHERLOCK_BUCKET_NAME}."* ]]; then
+        endpoint_no_proto="${endpoint_no_proto#"${SHERLOCK_BUCKET_NAME}."}"
+    fi
+
     if [[ "${endpoint_no_proto}" == *.digitaloceanspaces.com ]]; then
         export SHERLOCK_S3_REGION="${endpoint_no_proto%%.*}"
     elif [[ "${endpoint_no_proto}" == s3.*.amazonaws.com ]]; then
