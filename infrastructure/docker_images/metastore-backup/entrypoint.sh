@@ -17,6 +17,19 @@ if [[ -n "${S3_BUCKET:-}" && "${S3_END_POINT}" == "${S3_BUCKET}."* ]]; then
 	S3_END_POINT="${S3_END_POINT#"${S3_BUCKET}."}"
 fi
 
+# s3cmd expects use_https to be "Yes" or "No".
+if [[ -z "${S3_SSL_ENABLED:-}" ]]; then
+	export S3_USE_HTTPS="Yes"
+else
+	shopt -s nocasematch
+	if [[ "${S3_SSL_ENABLED}" == "true" || "${S3_SSL_ENABLED}" == "yes" || "${S3_SSL_ENABLED}" == "1" ]]; then
+		export S3_USE_HTTPS="Yes"
+	else
+		export S3_USE_HTTPS="No"
+	fi
+	shopt -u nocasematch
+fi
+
 # s3cmd needs a proper host_bucket template and region (bucket_location) for v4 signing.
 # - Path-style:  host_bucket = endpoint/%(bucket)
 # - VHost-style: host_bucket = %(bucket).endpoint

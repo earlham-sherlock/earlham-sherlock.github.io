@@ -2,7 +2,7 @@
 host_base = ${S3_END_POINT}
 host_bucket = ${S3_HOST_BUCKET}
 bucket_location = ${S3_REGION}
-use_https = ${S3_SSL_ENABLED}
+use_https = ${S3_USE_HTTPS}
 
 # Setup access keys
 access_key = ${S3_ACCESS_KEY}
